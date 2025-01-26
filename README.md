@@ -1,6 +1,16 @@
 [Bun installation](https://bun.sh/docs/installation)
 
 
+
+Fill in the .env file with the correct values.
+
+```
+bun i
+
+bun run dev
+```
+
+
 Each of these docusign accounts are essentially NGOs.
 
 My app name is SignForGood.. It helps bring transparency to NGOs funding and spending. we use docusign for everything..

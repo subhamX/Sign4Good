@@ -45,10 +45,8 @@ export const monitoredEnvelopes = pgTable('monitored_envelopes', {
 
   briefDescription: text('brief_description'),
 
-
   createdAt: timestamp('created_at').defaultNow().notNull(),
   createdBy: text('created_by').references(() => users.docusignId).notNull(),
-
 
   additionalInfo: jsonb('additional_info').$type<EnvelopeDocuSign>().notNull(),
 });
@@ -63,6 +61,7 @@ export const complianceForms = pgTable('compliance_forms', {
   dueDate: timestamp('due_date').notNull(),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  emailSentAt: timestamp('email_sent_at').defaultNow().notNull(),
   createdBy: text('created_by').references(() => users.docusignId).notNull(),
 });
 

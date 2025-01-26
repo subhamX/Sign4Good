@@ -40,6 +40,7 @@ export default async function OnboardingPage() {
     const userInfo = await getUserAndAccountInfo(userFromDb[0].accessToken)
 
     if ('error' in userInfo) {
+        console.log(userInfo)
         throw new Error("Error getting user info.. Logic error. this should never happen")
     }
 

@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { COUNTRIES } from "@/app/onboarding/countries";
 
 export default async function AccountDashboard({
   params
@@ -41,6 +42,7 @@ export default async function AccountDashboard({
     db
       .select({
         envelopeId: complianceForms.envelopeId,
+        emailSentAt: complianceForms.emailSentAt,
         rn: sql`ROW_NUMBER() OVER (PARTITION BY ${complianceForms.envelopeId} ORDER BY ${complianceForms.dueDate} DESC)`.as("rn")
       })
       .from(complianceForms)
@@ -65,19 +67,24 @@ export default async function AccountDashboard({
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Organization Details</h2>
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-6 rounded-lg shadow border">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <p className="text-gray-600">Organization Name</p>
               <p className="font-semibold">{accountInfo[0].docuSignAccountName}</p>
             </div>
-            <div>
+            {/* <div>
               <p className="text-gray-600">DocuSign Account</p>
               <p className="font-mono">{accountInfo[0].docuSignAccountId}</p>
-            </div>
+            </div> */}
             <div>
               <p className="text-gray-600">Region</p>
-              <p className="font-semibold">{accountInfo[0].country}</p>
+              <p className="font-semibold">{COUNTRIES.filter(c => c.value === accountInfo[0].country)[0].name}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-600"></p>
+              <p className="font-semibold">{COUNTRIES.filter(c => c.value === accountInfo[0].country)[0].name}</p>
             </div>
           </div>
         </div>
@@ -138,7 +145,7 @@ export default async function AccountDashboard({
           ) : (
 
           <div className="grid">
-            {monitoredEnvelopesData.map(({monitored_envelopes: envelope}) => {
+            {monitoredEnvelopesData.map(({monitored_envelopes: envelope, mostRecentComplianceForms}) => {
               const isOverdue = new Date(envelope.nextReviewDate) < new Date();
               const envelopeInfo = envelope.additionalInfo;
 
@@ -278,10 +285,15 @@ export default async function AccountDashboard({
                                 <div className="cursor-help bg-gray-50 p-3 rounded-lg">
                                   <p className="font-medium text-gray-700">Compliance Officer</p>
                                   <p>{envelope.complianceOfficerEmail}</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Last notified: {mostRecentComplianceForms?.emailSentAt ? 
+                                      new Date(mostRecentComplianceForms.emailSentAt).toLocaleString() : 
+                                      'Never'}
+                                  </p>
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Officer responsible for compliance review</p>
+                                <p>Officer responsible for compliance review and their last notification time</p>
                               </TooltipContent>
                             </Tooltip>
 

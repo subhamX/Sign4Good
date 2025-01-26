@@ -17,12 +17,13 @@ export default function Home() {
           SignForGood helps NGOs manage funding, ensure compliance, and track impact through secure DocuSign workflows
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4">
-          <Link href="/onboarding" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full gap-2">
+            <Button onClick={async () => {
+            const url = await getLoginUrl()
+            window.location.href = url
+          }}  size="lg" className="w-full gap-2">
               Get Started
               <ArrowRight className="w-4 h-4" />
             </Button>
-          </Link>
           <Link href="#features" className="w-full sm:w-auto">
             <Button size="lg" variant="outline" className="w-full">
               Learn More
@@ -75,12 +76,13 @@ export default function Home() {
           <p className="text-base md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto">
             Join NGOs using SignForGood to bring transparency and trust to their operations
           </p>
-          <Link href="/onboarding" className="block w-full sm:w-auto sm:inline-block">
-            <Button size="lg" className="w-full sm:w-auto gap-2">
+            <Button onClick={async () => {
+            const url = await getLoginUrl()
+            window.location.href = url
+          }}  size="lg" className="w-full sm:w-auto gap-2">
               Connect Your NGO
               <ArrowRight className="w-4 h-4" />
             </Button>
-          </Link>
         </div>
       </section>
     </div>
