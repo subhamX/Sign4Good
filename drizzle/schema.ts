@@ -15,6 +15,11 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const usersToAccountsBridgeTable = pgTable('users_to_accounts_bridge', {
+  userId: text('user_id').references(() => users.docusignId).notNull(),
+  accountId: text('account_id').references(() => accounts.docuSignAccountId).notNull(),
+});
+
 export const accounts = pgTable('enterprise_info', {
   docuSignAccountName: text('name').notNull(),
   docuSignAccountId: text('docu_sign_account_id').notNull().primaryKey(),
@@ -22,7 +27,6 @@ export const accounts = pgTable('enterprise_info', {
 
   donationLink: text('donation_link').notNull(),
 
-  userId: text('user_id').references(() => users.docusignId).notNull(),
   country: text('country').notNull(),
   score: integer('score').default(-1).notNull(), // -1 means not calculated yet
   includeInLeaderBoard: boolean('include_in_leader_board').default(true).notNull(),

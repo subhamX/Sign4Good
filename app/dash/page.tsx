@@ -5,7 +5,7 @@ import { LANDING_ROUTE, ONBOARD_ROUTE } from "@/routes.config";
 import { getUserInServer } from "../utils/setAuthTokenAsCookie";
 import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/db-config";
-import { accounts } from "@/drizzle/schema";
+import { accounts, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +25,9 @@ async function DashboardPage() {
     return redirect(LANDING_ROUTE)
   }
 
-  const alreadyConnectedAccounts = await db.select().from(accounts).where(eq(accounts.userId, user.docusignId))
+  const alreadyConnectedAccounts = await db.select().from(accounts)
+    .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
+    .where(eq(usersToAccountsBridgeTable.userId, user.docusignId))
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
@@ -69,7 +71,7 @@ async function DashboardPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {alreadyConnectedAccounts.map((account) => (
+            {alreadyConnectedAccounts.map(({enterprise_info: account}) => (
               <Link href={`/dash/${account.docuSignAccountId}`} key={account.docuSignAccountId} className="block">
                 <Card className="h-full group cursor-pointer border-primary/20 bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:bg-card/80 transition-all duration-300">
                   <CardHeader>

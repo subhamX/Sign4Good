@@ -3,7 +3,7 @@ import { getUserAndAccountInfo } from "../utils/getUserAndAccountInfo"
 import { getJwtPayloadFromCookie, getUserInServer } from "../utils/setAuthTokenAsCookie"
 import { redirect } from "next/navigation"
 import { db } from "@/drizzle/db-config"
-import { accounts, users } from "@/drizzle/schema"
+import { accounts, users, usersToAccountsBridgeTable } from "@/drizzle/schema"
 import { eq } from "drizzle-orm"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -45,8 +45,11 @@ export default async function OnboardingPage() {
     }
 
     console.log(userInfo.sub)
-    const alreadyConnectedAccounts = await db.select().from(accounts).where(eq(accounts.userId, userInfo.sub))
-    const connectedAccountIds = new Set(alreadyConnectedAccounts.map(acc => acc.docuSignAccountId))
+    const alreadyConnectedAccounts = await db.select().from(accounts)
+    .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
+    .where(eq(usersToAccountsBridgeTable.userId, userInfo.sub))
+    
+    const connectedAccountIds = new Set(alreadyConnectedAccounts.map(acc => acc.enterprise_info.docuSignAccountId))
 
 
 
@@ -94,7 +97,11 @@ export default async function OnboardingPage() {
                 includeInLeaderBoard: formData.leaderboard,
                 donationLink: formData.donationLink,
                 createdAt: new Date(),
+            })
+
+            await db.insert(usersToAccountsBridgeTable).values({
                 userId: user.docusignId,
+                accountId: formData.accountId,
             })
 
             revalidatePath(ONBOARD_ROUTE)

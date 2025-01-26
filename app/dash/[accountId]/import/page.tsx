@@ -1,6 +1,6 @@
 import { getUserInServer } from "@/app/utils/setAuthTokenAsCookie";
 import { db } from "@/drizzle/db-config";
-import { accounts, monitoredEnvelopes } from "@/drizzle/schema";
+import { accounts, monitoredEnvelopes, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { LANDING_ROUTE } from "@/routes.config";
@@ -23,10 +23,10 @@ export default async function AccountDashboard({
   const accountInfo = await db
     .select()
     .from(accounts)
+    .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
     .where(
       and(
-        eq(accounts.docuSignAccountId, accountId),
-        eq(accounts.userId, user.docusignId)
+        eq(usersToAccountsBridgeTable.userId, user.docusignId)
       )
     );
 

@@ -21,6 +21,7 @@ import { useState } from "react"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { COUNTRIES } from "./countries"
 import { AddNewAccountFormData, addNewAccountFormSchema } from "./typesX"
+import { useToast } from "@/hooks/use-toast"
 
 
 export default function OnboardingClient({
@@ -31,6 +32,7 @@ export default function OnboardingClient({
     handleAddNewAccount: (data: AddNewAccountFormData) => Promise<{ error?: string, message?: string }>,
 }) {
     const [submitting, setSubmitting] = useState<string | null>(null)
+    const { toast } = useToast()
 
     const form = useForm<AddNewAccountFormData>({
         resolver: zodResolver(addNewAccountFormSchema),
@@ -49,9 +51,16 @@ export default function OnboardingClient({
             const response = await handleAddNewAccount(data)
 
             if('error' in response){
-                alert(response.error)
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: response.error
+                })
             }else{
-                alert(response.message)
+                toast({
+                    title: "Success",
+                    description: response.message
+                })
             }
 
 

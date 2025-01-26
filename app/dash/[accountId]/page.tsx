@@ -1,6 +1,6 @@
 import { getUserInServer } from "@/app/utils/setAuthTokenAsCookie";
 import { db } from "@/drizzle/db-config";
-import { accounts, complianceForms, monitoredEnvelopes } from "@/drizzle/schema";
+import { accounts, complianceForms, monitoredEnvelopes, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { LANDING_ROUTE } from "@/routes.config";
@@ -27,10 +27,11 @@ export default async function AccountDashboard({
   const accountInfo = await db
     .select()
     .from(accounts)
+    .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
     .where(
       and(
         eq(accounts.docuSignAccountId, params.accountId),
-        eq(accounts.userId, user.docusignId)
+        eq(usersToAccountsBridgeTable.userId, user.docusignId)
       )
     );
 
@@ -71,7 +72,7 @@ export default async function AccountDashboard({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <p className="text-gray-600">Organization Name</p>
-              <p className="font-semibold">{accountInfo[0].docuSignAccountName}</p>
+              <p className="font-semibold">{accountInfo[0].enterprise_info.docuSignAccountName}</p>
             </div>
             {/* <div>
               <p className="text-gray-600">DocuSign Account</p>
@@ -79,12 +80,12 @@ export default async function AccountDashboard({
             </div> */}
             <div>
               <p className="text-gray-600">Region</p>
-              <p className="font-semibold">{COUNTRIES.filter(c => c.value === accountInfo[0].country)[0].name}</p>
+              <p className="font-semibold">{COUNTRIES.filter(c => c.value === accountInfo[0].enterprise_info.country)[0].name}</p>
             </div>
 
             <div>
-              <p className="text-gray-600"></p>
-              <p className="font-semibold">{COUNTRIES.filter(c => c.value === accountInfo[0].country)[0].name}</p>
+              <p className="text-gray-600">Part of global leaderboard</p>
+              <p className="font-semibold">{accountInfo[0].enterprise_info.includeInLeaderBoard ? 'Yes' : 'No'}</p>
             </div>
           </div>
         </div>
