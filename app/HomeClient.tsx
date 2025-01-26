@@ -18,7 +18,7 @@ export default function HomeClient({ user }: { user: jwtUserPayloadType | null }
         Bringing <TextShimmer
           duration={1.5}
           spread={3}
-          className='text-6xl font-bold [--base-color:theme(colors.gray.900)] [--base-gradient-color:theme(colors.gray.500)] dark:[--base-color:theme(colors.gray.900)] dark:[--base-gradient-color:theme(colors.gray.700)]'
+          className='lg:text-6xl font-bold [--base-color:theme(colors.gray.900)] [--base-gradient-color:theme(colors.gray.500)] dark:[--base-color:theme(colors.gray.900)] dark:[--base-gradient-color:theme(colors.gray.700)]'
         >
           Transparency
         </TextShimmer> to NGO Operations
