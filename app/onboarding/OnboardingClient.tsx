@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { X, ArrowRight } from "lucide-react"
+import { X, ArrowRight, UserCheck } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -78,7 +78,7 @@ export default function OnboardingClient({
     return (
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-background/95 to-background/90">
             <section className="container mx-auto">
-                <div className="space-y-6 text-center max-w-3xl mx-auto mb-16  translate-y-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards">
+                <div className="space-y-3 text-center max-w-3xl mx-auto mb-4 translate-y-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards">
                     <div className="relative">
                         <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-primary/20 via-primary/10 to-primary/5 -z-10" />
                         <h1 className="text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/80">
@@ -278,8 +278,8 @@ export default function OnboardingClient({
                     {notConnectedAccountsAndNotOnPlatform.length === 0 && (
                         <div className=" scale-95 animate-in fade-in zoom-in duration-500 fill-mode-forwards text-center py-16 px-4 rounded-lg border border-primary/10 bg-card/50 backdrop-blur-sm max-w-2xl mx-auto">
                             <div className="mb-6">
-                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 animate-pulse">
-                                    <ArrowRight className="w-8 h-8 text-primary" />
+                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                                    <UserCheck className="w-8 h-8 text-primary" />
                                 </div>
                                 <h3 className="text-2xl font-semibold text-foreground mb-2">
                                     All Accounts Connected
@@ -289,9 +289,9 @@ export default function OnboardingClient({
                                 </p>
                             </div>
                             <Link href={DASH_ROUTE} className="inline-block">
-                                <Button className="bg-gradient-to-r from-primary/90 to-primary text-primary-foreground px-8 py-6 h-auto text-lg font-medium shadow-md hover:shadow-lg transition-all duration-300">
+                                <Button className="bg-black hover:bg-orange-500 text-primary-foreground hover:text-white text-white px-6 py-4 h-auto text-lg font-medium transition-colors duration-200">
                                     Go to Dashboard
-                                    <ArrowRight className="w-5 h-5 ml-2" />
+                                    <ArrowRight className="w-5 h-5 ml-2 group-hover:text-white" />
                                 </Button>
                             </Link>
                         </div>

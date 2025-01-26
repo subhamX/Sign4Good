@@ -6,6 +6,7 @@ import { getUserInServer } from "../utils/setAuthTokenAsCookie";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/db-config";
+import { HyperText } from "@/components/ui/hypertext";
 import { accounts, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,7 +75,7 @@ async function DashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {alreadyConnectedAccounts.map(({enterprise_info: account}) => (
               <Link href={`/dash/${account.docuSignAccountId}`} key={account.docuSignAccountId} className="block">
-                <Card className="h-full group cursor-pointer border-primary/20 bg-card/50 backdrop-blur-sm hover:border-primary/40 hover:bg-card/80 transition-all duration-300">
+                <Card className="h-full group cursor-pointer border border-primary/20 bg-card/50 backdrop-blur-sm hover:border-4 hover:border-green-700/60 hover:bg-card/80 transition-all duration-100">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg md:text-xl font-semibold line-clamp-1">
@@ -111,7 +112,7 @@ async function DashboardPage() {
           <Card className="relative bg-primary/5 overflow-hidden">
           <BorderBeam size={250} duration={10} delay={9} />
             <CardHeader className="pb-2 md:pb-4">
-              <CardTitle className="text-lg md:text-xl">Platform Highlights</CardTitle>
+              <HyperText className="text-xl md:text-xl">💡 Platform Highlights</HyperText>
               <CardDescription className="text-sm md:text-base">Quick overview of SignForGood&apos;s impact</CardDescription>
             </CardHeader>
             <CardContent>

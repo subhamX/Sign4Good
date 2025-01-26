@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { LANDING_ROUTE } from "@/routes.config";
 import { CollapsibleDetails } from "./CollapsibleDetails";
 import { HyperText } from "@/components/ui/hypertext";
+import { BorderBeam } from "@/components/ui/border-beam";
 import {
   Tooltip,
   TooltipContent,
@@ -159,7 +160,7 @@ export default async function AccountDashboard({
               return (
                 <div
                   key={envelope.envelopeId}
-                  className={`bg-white p-6 rounded-lg border shadow border-l-4 ${isOverdue ? 'border-red-500' :
+                  className={`bg-white p-6 mb-6 rounded-lg border shadow border-l-4 ${isOverdue ? 'border-red-500' :
                     envelope.isFundingDocument ? 'border-green-500' :
                       'border-blue-500'
                     }`}
