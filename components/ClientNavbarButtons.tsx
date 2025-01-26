@@ -7,7 +7,7 @@ import { onLogout } from "./navbar.server";
 
 export const LogoutButton = () => {
   return (
-    <Button onClick={onLogout} variant="ghost" className="text-sm">
+    <Button onClick={onLogout} variant="ghost" className="text-sm hover:bg-red-500 hover:text-white transition-colors duration-300">
       Logout
     </Button>
   )
