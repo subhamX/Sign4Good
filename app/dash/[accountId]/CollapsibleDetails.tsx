@@ -9,7 +9,6 @@ export function CollapsibleDetails({
   envelope: {
     briefDescription: string | null;
     isProcessed: boolean;
-    isFundingDocument: boolean;
   }
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,15 +45,6 @@ export function CollapsibleDetails({
                 </span>
               </div>
             </div>
-            {envelope?.isFundingDocument && (
-              <div>
-                <p className="font-medium">Document Type</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
-                  <span>Funding Document</span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

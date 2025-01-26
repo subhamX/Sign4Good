@@ -4,10 +4,15 @@ import docusign from 'docusign-esign';
 import { eq } from 'drizzle-orm';
 import { db } from '@/drizzle/db-config';
 import { users, accounts, usersToAccountsBridgeTable } from '@/drizzle/schema';
+import { DOCUMENT_TYPE_KEY } from './envelopes.config';
+import { DOCUMENT_TYPE_VALUE } from './envelopes.config';
+
+
+
 
 export async function sendEnvelope(
-  accountId: string, 
-  signerEmail: string, 
+  accountId: string,
+  signerEmail: string,
   signerName: string
 ) {
   try {
@@ -44,9 +49,11 @@ export async function sendEnvelope(
 
     // 3) Load your PDF and convert to Base64
     //    Suppose it lives at ./app/dash/[accountId]/documents/sample_contract.pdf
-    const pdfPath = path.join(process.cwd(), 'app/dash/[accountId]/documents', 'sample_contract.pdf');
+    const pdfPath = path.join(process.cwd(), 'app/dash/[accountId]', 'sample_contract.pdf');
     const pdfBytes = fs.readFileSync(pdfPath);
     const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
+
+
 
     // 4) Create an Envelope definition
     const envelopeDefinition = {
@@ -60,6 +67,36 @@ export async function sendEnvelope(
           documentId: '1',
         },
       ],
+      customFields: {
+        textCustomFields: [
+          {
+            name: DOCUMENT_TYPE_KEY,
+            value: DOCUMENT_TYPE_VALUE,
+            required: 'true',
+            show: 'true',
+          },
+        ],
+      },
+      eventNotification: {
+        url: "https://signforgood.vercel.app/docusign/event-callback",
+        loggingEnabled: "true",
+        envelopeEvents: [
+          {
+            envelopeEventStatusCode: "completed"
+          },
+          {
+            envelopeEventStatusCode: "declined"
+          }
+        ],
+        recipientEvents: [
+          {
+            recipientEventStatusCode: "Sent"
+          },
+          {
+            recipientEventStatusCode: "Completed"
+          }
+        ]
+      },
       recipients: {
         signers: [
           {
@@ -85,7 +122,7 @@ export async function sendEnvelope(
 
     // 5) Send the Envelope
     const results = await envelopesApi.createEnvelope(accountId, { envelopeDefinition });
-    
+
     console.log(`Envelope created and sent successfully! EnvelopeId: ${results.envelopeId}`);
     
     return {
@@ -99,7 +136,7 @@ export async function sendEnvelope(
 }
 
 await sendEnvelope(
-    "3c51dad6-1384-4905-925e-decceaf0e375",
-    "gaurangruparelia007@gmail.com",
-    "Gaurang"
-  )
+  "3c51dad6-1384-4905-925e-decceaf0e375",
+  "gaurangruparelia007@gmail.com", // donor email
+  "Gaurang" // donor name
+)

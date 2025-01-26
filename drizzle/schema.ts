@@ -36,6 +36,7 @@ export const accounts = pgTable('enterprise_info', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
+
 export const monitoredEnvelopes = pgTable('monitored_envelopes', {
   envelopeId: text('envelope_id').notNull().primaryKey(),
   accountId: text('account_id').references(() => accounts.docuSignAccountId).notNull(),
@@ -46,7 +47,8 @@ export const monitoredEnvelopes = pgTable('monitored_envelopes', {
   nextReviewDate: timestamp('next_review_date').notNull(),
 
   isProcessed: boolean('is_processed').default(false).notNull(),
-  isFundingDocument: boolean('is_funding_document').default(false).notNull(),
+
+  // isFundingDocument: boolean('is_funding_document').default(false).notNull(),
 
   moneyReceivedTillDate: integer('money_received_till_date').default(0).notNull(),
 
@@ -66,6 +68,9 @@ export const complianceForms = pgTable('compliance_forms', {
 
   isCompleted: boolean('is_completed').default(false).notNull(),
   dueDate: timestamp('due_date').notNull(),
+
+  filledAtByComplianceOfficer: timestamp('filled_at_by_compliance_officer'),
+  signedAtByDonor: timestamp('signed_at_by_donor'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
   emailSentAt: timestamp('email_sent_at').defaultNow().notNull(),

@@ -163,8 +163,7 @@ export default async function AccountDashboard({
                 <div
                   key={envelope.envelopeId}
                   className={`bg-white p-6 mb-6 rounded-lg border shadow border-l-4 ${isOverdue ? 'border-red-500' :
-                    envelope.isFundingDocument ? 'border-green-500' :
-                      'border-blue-500'
+                   'border-green-500'
                     }`}
                 >
                   <div className="flex flex-col justify-between gap-4">
@@ -224,24 +223,6 @@ export default async function AccountDashboard({
                             </TooltipContent>
                           </Tooltip>
 
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className={`px-3 py-1 rounded-full text-sm cursor-help w-full text-center ${
-                                envelope.isFundingDocument ? 'bg-emerald-100 text-emerald-800' :
-                                envelope.isFundingDocument === false ? 'bg-gray-100 text-gray-600' :
-                                'bg-orange-100 text-orange-800'
-                              }`}>
-                                {envelope.isFundingDocument ? 'Grant/Funding' :
-                                 envelope.isFundingDocument === false ? 'Standard Document' :
-                                 'Document Type Pending'}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{envelope.isFundingDocument ? 'This document is related to grants or funding' :
-                                envelope.isFundingDocument === false ? 'Regular compliance document' :
-                                'Document type needs to be classified'}</p>
-                            </TooltipContent>
-                          </Tooltip>
                         </TooltipProvider>
                       </div>
 

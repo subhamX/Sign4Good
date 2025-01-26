@@ -4,6 +4,10 @@ import { getUserInServer } from "@/app/utils/setAuthTokenAsCookie";
 import { db } from "@/drizzle/db-config";
 import { users } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { DOCUMENT_TYPE_VALUE } from "./envelopes.config";
+import { DOCUMENT_TYPE_KEY } from "./envelopes.config";
+
+
 
 
 
@@ -90,13 +94,41 @@ export async function getEnvelopes(accountId: string): Promise<{ envelopes?: Env
     try {
         const data = await response.json();
 
-        if('errorCode' in data) {
+        if ('errorCode' in data) {
             return {
                 error: data.message
             }
         }
 
-        return data;
+        const envelopes = data.envelopes as EnvelopeDocuSign[];
+        // /restapi/v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields
+
+        const promises = envelopes.map(async (envelope: EnvelopeDocuSign) => {
+            const customFieldsResponse = fetch(`https://demo.docusign.net/restapi/v2.1/accounts/${accountId}/envelopes/${envelope.envelopeId}/custom_fields`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userInDb[0].accessToken}`,
+                },
+            });
+            return customFieldsResponse;
+        });
+
+        const customFields = await Promise.all(promises);
+
+        const envelopesWithCustomFields = await Promise.all(envelopes.map(async (envelope, index) => {
+            const jss = await customFields[index].json();
+            envelope.customFields = jss;
+            return envelope;
+        }));
+
+
+        const filteredEnvelopesWithCustomFields = envelopesWithCustomFields.filter(envelope => (
+            envelope.customFields.textCustomFields?.find(field => field.name === DOCUMENT_TYPE_KEY)?.['value'] !== DOCUMENT_TYPE_VALUE
+        ))
+
+        return {
+            envelopes: filteredEnvelopesWithCustomFields
+        }
     } catch (error: unknown) {
         return {
             error: error instanceof Error ? error.message : 'An unknown error occurred'
