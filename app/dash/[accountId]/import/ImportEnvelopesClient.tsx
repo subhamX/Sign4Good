@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 interface EnvelopeWithSettings {
   envelopeId: string;
   complianceOfficerEmail: string;
+  donorOfficerEmail: string;
   monitoringFrequencyDays: number;
 }
 
@@ -27,9 +28,12 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
   const [envelopeSettings, setEnvelopeSettings] = useState<Map<string, EnvelopeWithSettings>>(new Map(envelopes.map(envelope => [envelope.envelopeId, {
     envelopeId: envelope.envelopeId,
     complianceOfficerEmail: envelope.sender.email,
+    donorOfficerEmail: '',
     monitoringFrequencyDays: 14,
   }])));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [complianceOfficerEmail, setComplianceOfficerEmail] = useState('');
+  const [donorOfficerEmail, setDonorOfficerEmail] = useState('');
 
   const handleSubmit = async () => {
     if (selectedEnvelopes.size === 0) {
@@ -63,6 +67,7 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
           return {
             envelopeId,
             complianceOfficerEmail: settings.complianceOfficerEmail,
+            donorOfficerEmail: settings.donorOfficerEmail,
             monitoringFrequencyDays: settings.monitoringFrequencyDays,
           };
         }),
@@ -102,6 +107,7 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
       const current = newSettings.get(envelopeId) || {
         envelopeId,
         complianceOfficerEmail: '',
+        donorOfficerEmail: '',
         monitoringFrequencyDays: 14,
       };
       newSettings.set(envelopeId, { ...current, [field]: value });
@@ -173,6 +179,18 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
                         type="email"
                         value={settings?.complianceOfficerEmail || ''}
                         onChange={(e) => updateEnvelopeSetting(envelope.envelopeId, 'complianceOfficerEmail', e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Enter email address"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Donor Officer Email
+                      </label>
+                      <Input
+                        type="email"
+                        value={settings?.donorOfficerEmail || ''}
+                        onChange={(e) => updateEnvelopeSetting(envelope.envelopeId, 'donorOfficerEmail', e.target.value)}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="Enter email address"
                       />

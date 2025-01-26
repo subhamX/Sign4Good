@@ -11,6 +11,7 @@ import { getEnvelopes } from './envelopes.server';
 const envelopeSchema = z.object({
   envelopeId: z.string(),
   complianceOfficerEmail: z.string().email(),
+  donorOfficerEmail: z.string().email(),
   monitoringFrequencyDays: z.number().int().min(1),
 });
 
@@ -38,7 +39,6 @@ export async function createEnvelopesServerAction(formData: z.infer<typeof reque
       }
     }
 
-
     // Create monitoring records for each envelope
     await db.transaction(async (tx) => {
       for (const envelope of validatedData.envelopes) {
@@ -55,7 +55,8 @@ export async function createEnvelopesServerAction(formData: z.infer<typeof reque
         await tx.insert(monitoredEnvelopes).values({
           envelopeId: envelope.envelopeId,
           accountId: validatedData.accountId,
-          complianceOfficerEmail: envelope.complianceOfficerEmail,
+          complianceOfficerEmail: envelope.complianceOfficerEmail || "gaurangruparelia007@gmail.com",
+          donorOfficerEmail: envelope.donorOfficerEmail || "gaurangruparelia007@gmail.com",
           monitoringFrequencyDays: envelope.monitoringFrequencyDays,
           nextReviewDate,
           createdBy: user.docusignId,

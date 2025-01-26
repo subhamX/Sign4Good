@@ -308,6 +308,18 @@ export default async function AccountDashboard({
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className="cursor-help bg-gray-50 p-3 rounded-lg">
+                                  <p className="font-medium text-gray-700">Donor Officer</p>
+                                  <p>{envelope.donorOfficerEmail}</p>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Officer responsible for donor relations</p>
+                              </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
                                   <p className="font-medium text-gray-700">Next Review Date</p>
                                   <p className={isOverdue ? 'text-red-600 font-medium' : ''}>
                                     {new Date(envelope.nextReviewDate).toLocaleString()}

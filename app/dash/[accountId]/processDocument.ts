@@ -66,6 +66,13 @@ export const processDocument = async (envelopeId: string) => {
   console.log(`PDF saved to ${tempFilePath}`);
 
   // Additional logic could happen here, e.g. updating DB references, etc.
+
+  // When processing documents, you might want to handle both officers
+//   const { complianceOfficerEmail, donorOfficerEmail } = envelope[0];
+
+  // Add logic to handle both officers in your document processing
+  // This might include creating signature fields for both officers
+  // or handling their responses separately
 };
 
 

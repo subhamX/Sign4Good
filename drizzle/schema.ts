@@ -40,6 +40,7 @@ export const monitoredEnvelopes = pgTable('monitored_envelopes', {
   envelopeId: text('envelope_id').notNull().primaryKey(),
   accountId: text('account_id').references(() => accounts.docuSignAccountId).notNull(),
   complianceOfficerEmail: text('compliance_officer_email').notNull(),
+  donorOfficerEmail: text('donor_officer_email').notNull(),
   monitoringFrequencyDays: integer('monitoring_frequency_days').default(14).notNull(),
 
   nextReviewDate: timestamp('next_review_date').notNull(),
