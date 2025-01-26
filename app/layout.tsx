@@ -11,8 +11,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CompliSign - NGO Document Management",
-  description: "Empower your NGO with seamless document management and compliance",
+  title: "SignForGood - NGO Transparency",
+  description: "Empower your NGO with transparency and compliance",
 };
 
 export default function RootLayout({
