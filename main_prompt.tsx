@@ -1,54 +1,104 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import OpenAI from "openai";
+import * as pdfjsLib from 'pdfjs-dist';
+import 'pdfjs-dist/build/pdf.worker.entry';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+interface FormField {
+  label: string;
+  name: string;
+  type: string;
+  placeholder?: string;
+  options?: string[];
+}
 
 const App: React.FC = () => {
-  const [formData, setFormData] = useState<any>({});
-  const [formFields, setFormFields] = useState<any[]>([]);
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formFields, setFormFields] = useState<FormField[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [contractText, setContractText] = useState<string>("");
+
+  const parsePDF = async (file: File): Promise<string> => {
+    try {
+      const fileReader = new FileReader();
+      return new Promise((resolve, reject) => {
+        fileReader.onload = async (e) => {
+          try {
+            const typedArray = new Uint8Array(e.target?.result as ArrayBuffer);
+            const pdf = await pdfjsLib.getDocument(typedArray).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              const pageText = textContent.items
+                .map((item: any) => item.str)
+                .join(' ');
+              fullText += pageText + '\n';
+            }
+
+            resolve(fullText);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        fileReader.readAsArrayBuffer(file);
+      });
+    } catch (error) {
+      console.error("PDF parsing error:", error);
+      throw error;
+    }
+  };
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const extractedText = await parsePDF(file);
+        setContractText(extractedText);
+      } catch (error) {
+        setError("Failed to parse PDF. Please try again.");
+      }
+    }
+  };
 
   const fetchFormFields = async () => {
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      dangerouslyAllowBrowser: true
+      apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+      dangerouslyAllowBrowser: true,
     });
 
-    const prompt = `Analyze the following compliance clauses from a legal agreement and suggest form fields to gather updates from the NGO Compliance Officer.
+    const prompt = `Imagine you are a meticulous Compliance Officer tasked with creating a standardized reporting template for a new organizational partnership. Analyze the provided contract text with the following objectives:
 
-        Compliance Clauses:
-        1. Ongoing Compliance with Donor Policy: The Recipient will adhere to SWEET DREAMERS' Philanthropic Compliance Policies.
-        2. Legal and Regulatory Adherence: The Recipient shall comply with all relevant laws concerning charitable donations.
-        3. Ethical Conduct: Avoid conflicts of interest, bribery, or corruption. Promptly report misuse of funds.
-        4. Audit Rights: The Donor reserves the right to audit the Recipient's use of funds.
+    1. Identify key compliance requirements and reporting obligations
+    2. Extract stakeholder information without relying on specific company names
+    3. Determine critical verification points that ensure partnership integrity
+    4. Generate form fields that capture essential compliance data
 
-        Your task:
-        1. Extract key aspects of compliance from the clauses that require periodic updates or verification.
-        2. Translate these aspects into form fields with appropriate HTML input types (e.g., \"text\", \"textarea\", \"select\", \"date\", etc.).
-        3. Provide a JSON response with the following format:
-        \`\`\`json
-        [
-            {
-                "label": "Field Label",
-                "name": "field_name",
-                "type": "input_type",
-                "placeholder": "Sample placeholder or guidance text",
-                "options": ["Option1", "Option2"] // Only for dropdowns or radio buttons
-            }
-        ]
-        \`\`\`
+    Your form fields should:
+    - Be generic enough to work across different organizational contexts
+    - Focus on universal compliance principles
+    - Use clear, professional language
+    - Provide guidance through placeholders
+    - Offer flexibility for various partnership types
 
-        Additional Requirements:
-        1. Explain the reasoning for each form field and its input type.
-        2. Ensure the fields are specific, clear, and practical for capturing compliance updates.
-        3. Include examples or sample values in the placeholders for clarity.
-        4. Think step-by-step, and output your reasoning along with the JSON.
-        5. Keep the response concise and accurate.`;
+    Create form fields as a JSON response, ensuring each field includes:
+    - A clear, descriptive label
+    - A unique field name
+    - Appropriate input type
+    - Helpful placeholder text
+    - Optional predefined options where relevant
+
+    Contract Text to Analyze:
+    ${contractText}`;
 
     try {
       setError(null);
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
       });
 
       const fieldsText = response.choices[0].message.content;
@@ -73,19 +123,37 @@ const App: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Submitted Data:", JSON.stringify(formData, null, 2));
+    console.log("Submitted Compliance Data:", JSON.stringify(formData, null, 2));
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">NGO Compliance Form</h1>
+    <div className="p-4 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4 text-center">Universal Compliance Form Generator</h1>
+      
+      <input 
+        type="file" 
+        accept=".pdf" 
+        onChange={handleFileUpload} 
+        className="w-full mb-4"
+      />
+      
+      <textarea 
+        value={contractText}
+        onChange={(e) => setContractText(e.target.value)}
+        placeholder="PDF content will appear here or paste contract text..."
+        className="w-full h-40 border p-2 mb-4 rounded"
+      />
+
       <button
         onClick={fetchFormFields}
-        className="mb-4 bg-blue-500 text-white py-2 px-4 rounded"
+        disabled={!contractText.trim()}
+        className="w-full mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition disabled:opacity-50"
       >
-        Generate Form Fields
+        Generate Compliance Fields
       </button>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+
+      {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+
       <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
         {formFields.map((field, index) => (
           <div key={index} className="flex flex-col">
@@ -97,7 +165,7 @@ const App: React.FC = () => {
                 id={field.name}
                 placeholder={field.placeholder}
                 onChange={(e) => handleInputChange(field.name, e.target.value)}
-                className="border p-2 rounded"
+                className="border p-2 rounded min-h-[100px]"
               />
             ) : field.type === "select" ? (
               <select
@@ -122,12 +190,15 @@ const App: React.FC = () => {
             )}
           </div>
         ))}
-        <button
-          onClick={handleSubmit}
-          className="bg-green-500 text-white py-2 px-4 rounded"
-        >
-          Submit
-        </button>
+
+        {formFields.length > 0 && (
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
+          >
+            Submit Compliance Report
+          </button>
+        )}
       </form>
     </div>
   );
