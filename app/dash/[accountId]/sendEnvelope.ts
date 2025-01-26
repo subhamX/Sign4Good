@@ -87,6 +87,7 @@ export async function sendEnvelope(
     const results = await envelopesApi.createEnvelope(accountId, { envelopeDefinition });
     
     console.log(`Envelope created and sent successfully! EnvelopeId: ${results.envelopeId}`);
+    
     return {
       envelopeId: results.envelopeId,
       message: 'Envelope sent successfully',
