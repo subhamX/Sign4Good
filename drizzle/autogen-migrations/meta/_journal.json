@@ -71,6 +71,13 @@
       "when": 1737892752786,
       "tag": "0009_classy_justin_hammer",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1737898032657,
+      "tag": "0010_wet_excalibur",
+      "breakpoints": true
     }
   ]
 }

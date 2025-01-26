@@ -12,14 +12,7 @@ export const processDocument = async (envelopeId: string) => {
     }
 
     const envelopeInfo = envelope[0].additionalInfo;
-
     const attachmentUri = envelopeInfo.attachmentsUri;
-
-    // get the attachment
-    //   # Construct your API headers
-    // declare -a Headers=('--header' "Authorization: Bearer ${ACCESS_TOKEN}" \
-    // 					'--header' "Accept: application/json" \
-    // 					'--header' "Content-Type: application/json")
 
     const uri = `https://account-d.docusign.com/api/v2/accounts/${envelope[0].accountId}/envelopes/${envelopeId}/attachments`
 

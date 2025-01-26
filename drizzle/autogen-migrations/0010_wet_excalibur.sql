@@ -1,0 +1,1 @@
+ALTER TABLE "users_to_accounts_bridge" ADD CONSTRAINT "users_to_accounts_bridge_user_id_account_id_pk" PRIMARY KEY("user_id","account_id");

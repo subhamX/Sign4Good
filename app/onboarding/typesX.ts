@@ -10,4 +10,10 @@ export const addNewAccountFormSchema = z.object({
     accountId: z.string()
 })
 
-export type AddNewAccountFormData = z.infer<typeof addNewAccountFormSchema>
+export const addNewAccountFormSchemaAlreadyConnected = z.object({
+    accountId: z.string(),
+    alreadyConnected: z.boolean()
+})
+
+
+export type AddNewAccountFormData = z.infer<typeof addNewAccountFormSchema> | z.infer<typeof addNewAccountFormSchemaAlreadyConnected>

@@ -1,5 +1,5 @@
 import { EnvelopeDocuSign } from '@/app/dash/[accountId]/envelopes.server';
-import { pgTable, serial, text, timestamp, integer, boolean, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, integer, boolean, jsonb, primaryKey } from 'drizzle-orm/pg-core';
 
 // Users table to store DocuSign authenticated users
 export const users = pgTable('users', {
@@ -18,7 +18,9 @@ export const users = pgTable('users', {
 export const usersToAccountsBridgeTable = pgTable('users_to_accounts_bridge', {
   userId: text('user_id').references(() => users.docusignId).notNull(),
   accountId: text('account_id').references(() => accounts.docuSignAccountId).notNull(),
-});
+}, (t) => ({
+  pk: primaryKey({ columns: [t.userId, t.accountId] })
+}));
 
 export const accounts = pgTable('enterprise_info', {
   docuSignAccountName: text('name').notNull(),
