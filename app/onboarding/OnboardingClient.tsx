@@ -76,7 +76,7 @@ export default function OnboardingClient({
     }
 
     return (
-        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-background/95 to-background/90">
+        <div className="min-h-screen py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-background/95 to-background/90">
             <section className="container mx-auto">
                 <div className="space-y-3 text-center max-w-3xl mx-auto mb-4 translate-y-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards">
                     <div className="relative">

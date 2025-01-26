@@ -47,7 +47,7 @@ export function NGOSelector({ ngos, currentNGO }: NGOSelectorProps) {
         size="sm"
         onClick={() => handleNGOChange('overview')}
         className={cn(
-          "flex items-center gap-2 text-sm",
+          "hidden md:flex items-center gap-2 text-sm",
           isOverviewActive && "font-medium"
         )}
       >

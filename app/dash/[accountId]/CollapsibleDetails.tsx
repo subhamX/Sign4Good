@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, CircleAlert } from "lucide-react";
 import { useState } from "react";
 
 export function CollapsibleDetails({ 
@@ -20,7 +20,10 @@ export function CollapsibleDetails({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-2 text-sm text-gray-600 hover:text-gray-900"
       >
-        <span>Additional Details</span>
+        <span className="flex items-center">
+          <CircleAlert className="w-4 h-4 mr-2" />
+          Additional Details
+        </span>
         {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
       {isOpen && (
