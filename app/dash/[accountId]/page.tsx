@@ -5,6 +5,7 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { LANDING_ROUTE } from "@/routes.config";
 import { CollapsibleDetails } from "./CollapsibleDetails";
+import { HyperText } from "@/components/ui/hypertext";
 import {
   Tooltip,
   TooltipContent,
@@ -102,7 +103,7 @@ export default async function AccountDashboard({
             <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
               <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-semibold text-gray-800 mb-3">Get Started with CompliSign</h3>
+                <HyperText className="text-2xl font-semibold text-gray-800 mb-3">Get Started with CompliSign</HyperText>
                   <p className="text-gray-600">Set up your NGO's compliance monitoring system in three easy steps</p>
                 </div>
 

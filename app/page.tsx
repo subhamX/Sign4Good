@@ -1,6 +1,7 @@
 'use client'
 import { getLoginUrl } from "./getAuthUrl";
 import { RainbowButton } from "@/components/ui/rainbow-button";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-btn";
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, FileCheck, DollarSign, Trophy, Shield } from "lucide-react"
@@ -17,13 +18,12 @@ export default function Home() {
           SignForGood helps NGOs manage funding, ensure compliance, and track impact through secure DocuSign workflows
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4">
-            <Button onClick={async () => {
-            const url = await getLoginUrl()
-            window.location.href = url
-          }}  size="lg" className="w-full gap-2">
-              Get Started
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+          <InteractiveHoverButton
+              onClick={async () => {
+                const url = await getLoginUrl();
+                window.location.href = url;
+              }}
+            />
           <Link href="#features" className="w-full sm:w-auto">
             <Button size="lg" variant="outline" className="w-full">
               Learn More

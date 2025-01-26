@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LANDING_ROUTE, ONBOARD_ROUTE } from "@/routes.config";
 import { getUserInServer } from "../utils/setAuthTokenAsCookie";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/db-config";
 import { accounts, usersToAccountsBridgeTable } from "@/drizzle/schema";
@@ -107,7 +108,8 @@ async function DashboardPage() {
       {/* Quick Stats Section */}
       {alreadyConnectedAccounts.length > 0 && (
         <section className="mt-8 md:mt-12">
-          <Card className="bg-primary/5">
+          <Card className="relative bg-primary/5 overflow-hidden">
+          <BorderBeam size={250} duration={10} delay={9} />
             <CardHeader className="pb-2 md:pb-4">
               <CardTitle className="text-lg md:text-xl">Platform Highlights</CardTitle>
               <CardDescription className="text-sm md:text-base">Quick overview of SignForGood&apos;s impact</CardDescription>
