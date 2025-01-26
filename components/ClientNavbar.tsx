@@ -8,6 +8,7 @@ import { NGOSelector } from "./NGOSelector";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { DASH_ACCOUNT_ROUTE } from "@/routes.config";
 
 export const ClientNavbar = ({
     user,
@@ -24,6 +25,8 @@ export const ClientNavbar = ({
 
     console.log(currentNGO)
 
+
+    const ngoDashLink = currentNGO ? DASH_ACCOUNT_ROUTE(currentNGO.id) : null;
     return (
         <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 md:h-16 items-center justify-between px-4">
@@ -36,9 +39,18 @@ export const ClientNavbar = ({
 
                 {/* NGO Selector is always visible if available */}
                 <div className="flex items-center gap-2">
-                    {user && connectedNGOs.length > 0 && (
-                        <NGOSelector ngos={connectedNGOs} currentNGO={currentNGO} />
-                    )}
+                    {ngoDashLink &&
+                        <Link href={ngoDashLink}>
+                            <Button
+                                variant={currentpath === ngoDashLink ? "secondary" : "ghost"}
+                                size="sm" className="text-sm">
+                                Dashboard
+                            </Button>
+                        </Link>}
+
+
+                    
+
 
                     {/* Mobile Menu */}
                     <div className="md:hidden">
@@ -88,9 +100,9 @@ export const ClientNavbar = ({
                         {user && (
                             <>
                                 <Link href="/leaderboard">
-                                    <Button 
-                                        variant={currentpath === "/leaderboard" ? "secondary" : "ghost"} 
-                                        size="sm" 
+                                    <Button
+                                        variant={currentpath === "/leaderboard" ? "secondary" : "ghost"}
+                                        size="sm"
                                         className={cn(
                                             "text-sm",
                                             currentpath === "/leaderboard" && "font-medium"
@@ -100,9 +112,9 @@ export const ClientNavbar = ({
                                     </Button>
                                 </Link>
                                 <Link href="/onboarding">
-                                    <Button 
-                                        variant={currentpath === "/onboarding" ? "secondary" : "ghost"} 
-                                        size="sm" 
+                                    <Button
+                                        variant={currentpath === "/onboarding" ? "secondary" : "ghost"}
+                                        size="sm"
                                         className={cn(
                                             "text-sm whitespace-nowrap",
                                             currentpath === "/onboarding" && "font-medium"
@@ -115,6 +127,11 @@ export const ClientNavbar = ({
                         )}
                         {!user ? <LoginButton /> : <LogoutButton />}
                     </div>
+
+
+                    {user && connectedNGOs.length > 0 && (
+                        <NGOSelector ngos={connectedNGOs} currentNGO={currentNGO} />
+                    )}
                 </div>
             </div>
         </nav>
