@@ -33,7 +33,6 @@
     "next": "15.1.6",
     "openai": "^4.80.1",
     "pdf-img-convert": "^2.0.0",
-    "pdf-poppler": "^0.2.1",
     "pg": "^8.13.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
