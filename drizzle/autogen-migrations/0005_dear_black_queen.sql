@@ -1,0 +1,1 @@
+ALTER TABLE "monitored_envelopes" ADD COLUMN "brief_description" text;

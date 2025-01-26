@@ -1,0 +1,1 @@
+ALTER TABLE "monitored_envelopes" ALTER COLUMN "additional_info" SET NOT NULL;
