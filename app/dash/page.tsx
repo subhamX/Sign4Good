@@ -78,13 +78,13 @@ async function DashboardPage() {
                 <Card className="h-full group cursor-pointer border border-primary/20 bg-card/50 backdrop-blur-sm hover:border-4 hover:border-green-700/60 hover:bg-card/80 transition-all duration-100">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg md:text-xl font-semibold line-clamp-1">
+                      <CardTitle className="text-lg md:text-xl font-semibold  text-ellipsis truncate">
                         {account.docuSignAccountName}
                       </CardTitle>
                       <ArrowRight className="w-5 h-5 text-primary/50 group-hover:text-primary transition-colors" />
                     </div>
-                    <CardDescription className="text-sm line-clamp-1">
-                      {account.donationLink ? `Donation Portal: ${account.donationLink}` : "Set up your donation portal"}
+                    <CardDescription className="text-xs text-ellipsis truncate">
+                      Donation Portal: <span className="text-blue-600">{account.donationLink}</span>
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-2 md:pt-4">
