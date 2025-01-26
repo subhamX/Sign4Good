@@ -125,7 +125,7 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
       <div className="grid gap-4">
         {!envelopes || envelopes.length === 0 ? (
           <div className="bg-white p-4 rounded shadow text-center text-gray-600">
-            No documents available for import.
+            No documents available for import. Note, you need to be an Admin of the Docusign Org to import documents..
           </div>
         ) : (
           envelopes.map((envelope) => {

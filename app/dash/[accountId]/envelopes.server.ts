@@ -79,16 +79,22 @@ export async function getEnvelopes(accountId: string): Promise<{ envelopes?: Env
         'from_date': '2024-01-01',
     });
 
+
     const response = await fetch(`https://demo.docusign.net/restapi/v2.1/accounts/${accountId}/envelopes?${urlSearchParams.toString()}`, {
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${userInDb[0].accessToken}`,
+            'Authorization': `Bearer ${userInDb[0].accessToken}`,
         },
     });
 
     try {
         const data = await response.json();
-        // console.log(data);
+
+        if('errorCode' in data) {
+            return {
+                error: data.message
+            }
+        }
 
         return data;
     } catch (error: unknown) {

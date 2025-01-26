@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { ClientNavbar } from "./ClientNavbar"
 
 export async function Navbar() {
   const user = await getUserInServer()
@@ -32,81 +33,10 @@ export async function Navbar() {
     .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
     .where(eq(usersToAccountsBridgeTable.userId, user?.docusignId)) : []
 
-  const currentNGO = connectedNGOs.length > 0 ? connectedNGOs[0] : null
-
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 md:h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex flex-col">
-            <span className="text-lg font-bold tracking-tight">SignForGood</span>
-            <span className="text-xs text-muted-foreground">NGO Transparency</span>
-          </Link>
-        </div>
-
-        {/* NGO Selector is always visible if available */}
-        <div className="flex items-center gap-2">
-          {user && connectedNGOs.length > 0 && (
-            <NGOSelector ngos={connectedNGOs} currentNGO={currentNGO} />
-          )}
-
-          {/* Mobile Menu */}
-          <div className="md:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {user && (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/leaderboard" className="flex items-center">
-                        🏆 Leaderboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/onboarding" className="flex items-center">
-                        + Add NGO
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-                {!user ? (
-                  <DropdownMenuItem>
-                    <LoginButton />
-                  </DropdownMenuItem>
-                ) : (
-                  <DropdownMenuItem>
-                    <LogoutButton />
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-2">
-            {user && (
-              <>
-                <Link href="/leaderboard">
-                  <Button variant="ghost" size="sm" className="text-sm">
-                    🏆 Leaderboard
-                  </Button>
-                </Link>
-                <Link href="/onboarding">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    + Add NGO
-                  </Button>
-                </Link>
-              </>
-            )}
-            {!user ? <LoginButton /> : <LogoutButton />}
-          </div>
-        </div>
-      </div>
-    </nav>
+    <ClientNavbar
+      user={user}
+      connectedNGOs={connectedNGOs}
+    />
   )
 } 

@@ -97,6 +97,9 @@ export default async function AccountDashboard({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Monitored Documents</h2>
+          <a href={`/dash/${accountId}/import`} className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            Import Documents
+          </a>
         </div>
         <div className="grid gap-6">
           {monitoredEnvelopesData.length === 0 ? (
@@ -148,7 +151,7 @@ export default async function AccountDashboard({
             </div>
           ) : (
 
-          <div className="grid">
+          <div className="grid gap-5">
             {monitoredEnvelopesData.map(({monitored_envelopes: envelope, mostRecentComplianceForms}) => {
               const isOverdue = new Date(envelope.nextReviewDate) < new Date();
               const envelopeInfo = envelope.additionalInfo;

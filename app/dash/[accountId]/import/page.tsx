@@ -23,7 +23,10 @@ export default async function AccountDashboard({
   const accountInfo = await db
     .select()
     .from(accounts)
-    .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
+    .innerJoin(usersToAccountsBridgeTable, eq(
+      accounts.docuSignAccountId,
+      usersToAccountsBridgeTable.accountId
+    ))
     .where(
       and(
         eq(usersToAccountsBridgeTable.userId, user.docusignId)
@@ -38,7 +41,7 @@ export default async function AccountDashboard({
   const data = await getEnvelopes(accountId);
 
   if ('error' in data) {
-    return <div>Error loading envelopes</div>;
+    return <div>Error loading envelopes: {data.error}</div>;
   }
 
   // Get existing monitored envelopes
