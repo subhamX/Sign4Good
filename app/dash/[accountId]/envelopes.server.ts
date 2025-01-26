@@ -91,9 +91,9 @@ export async function getEnvelopes(accountId: string): Promise<{ envelopes?: Env
         // console.log(data);
 
         return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
         return {
-            error: error.message
+            error: error instanceof Error ? error.message : 'An unknown error occurred'
         }
     }
 

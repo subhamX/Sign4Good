@@ -16,12 +16,14 @@ import { COUNTRIES } from "@/app/onboarding/countries";
 export default async function AccountDashboard({
   params
 }: {
-  params: { accountId: string }
+  params: Promise<{ accountId: string }>
 }) {
   const user = await getUserInServer();
   if (!user) {
     redirect(LANDING_ROUTE);
   }
+
+  const {accountId} = await params;
 
   // Get account info
   const accountInfo = await db
@@ -30,7 +32,7 @@ export default async function AccountDashboard({
     .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
     .where(
       and(
-        eq(accounts.docuSignAccountId, params.accountId),
+        eq(accounts.docuSignAccountId, accountId),
         eq(usersToAccountsBridgeTable.userId, user.docusignId)
       )
     );
@@ -60,7 +62,7 @@ export default async function AccountDashboard({
         eq(rankedComplianceForms.rn, 1)
       )
     )
-    .where(eq(monitoredEnvelopes.accountId, params.accountId));
+    .where(eq(monitoredEnvelopes.accountId, accountId));
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
@@ -110,7 +112,7 @@ export default async function AccountDashboard({
                     <div>
                       <h4 className="font-medium text-gray-900 mb-1">Connect Your Documents</h4>
                       <p className="text-gray-600 mb-3">Import your DocuSign documents to begin compliance tracking</p>
-                      <a href={`/dash/${params.accountId}/import`} className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                      <a href={`/dash/${accountId}/import`} className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                         Connect Documents
                       </a>
                     </div>

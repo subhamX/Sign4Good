@@ -1,9 +1,7 @@
 'use client'
 import { getLoginUrl } from "@/app/getAuthUrl";
 import { RainbowButton } from "./ui/rainbow-button";
-import { LANDING_ROUTE } from "@/routes.config";
 import { Button } from "./ui/button";
-import { AUTH_COOKIE_NAME } from "@/app/utils/setAuthTokenAsCookie";
 import { onLogout } from "./navbar.server";
 
 

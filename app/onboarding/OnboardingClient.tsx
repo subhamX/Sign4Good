@@ -1,20 +1,13 @@
 'use client'
 
-import { DASH_ROUTE, LANDING_ROUTE } from "@/routes.config"
-import { DocusignUserInfoResponse, DocusignUserInfoResponseUser, getUserAndAccountInfo } from "../utils/getUserAndAccountInfo"
-import { getJwtPayloadFromCookie, getUserInServer } from "../utils/setAuthTokenAsCookie"
-import { redirect } from "next/navigation"
-import { db } from "@/drizzle/db-config"
-import { accounts, users } from "@/drizzle/schema"
-import { eq } from "drizzle-orm"
+import { DASH_ROUTE } from "@/routes.config"
+import { DocusignUserInfoResponseUser } from "../utils/getUserAndAccountInfo"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
@@ -64,8 +57,16 @@ export default function OnboardingClient({
             }
 
 
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Submission error:", error)
+
+            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
+
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: errorMessage
+            })
         } finally {
             setSubmitting(null)
         }
@@ -86,7 +87,7 @@ export default function OnboardingClient({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                    {notConnectedAccounts.map((account: any) => (
+                    {notConnectedAccounts.map((account) => (
                         <Card key={account.account_id} className="backdrop-blur-sm bg-card/50 border-primary/10 transition-all duration-300 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 hover:bg-card/80">
                             <CardHeader>
                                 <div className="flex items-center justify-between">

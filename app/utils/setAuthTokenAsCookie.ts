@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SignJWT, base64url, decodeJwt, jwtVerify } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import { users } from "@/drizzle/schema";
 import { cookies } from "next/headers"
 

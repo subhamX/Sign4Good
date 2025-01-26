@@ -1,24 +1,11 @@
 import { LANDING_ROUTE, ONBOARD_ROUTE } from "@/routes.config"
 import { getUserAndAccountInfo } from "../utils/getUserAndAccountInfo"
-import { getJwtPayloadFromCookie, getUserInServer } from "../utils/setAuthTokenAsCookie"
+import { getUserInServer } from "../utils/setAuthTokenAsCookie"
 import { redirect } from "next/navigation"
 import { db } from "@/drizzle/db-config"
 import { accounts, users, usersToAccountsBridgeTable } from "@/drizzle/schema"
 import { eq } from "drizzle-orm"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Check, X, ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Link from "next/link"
-import { Form } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import OnboardingClient from "./OnboardingClient"
-import { COUNTRIES } from "./countries"
 import { AddNewAccountFormData, addNewAccountFormSchema } from "./typesX"
 import { revalidatePath } from "next/cache"
 
@@ -109,10 +96,10 @@ export default async function OnboardingPage() {
             return {
                 message: "Account added successfully"
             }
-        } catch (err: any) {
-            console.log(err)
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
             return {
-                error: err.message
+                error: errorMessage
             }
         }
     }

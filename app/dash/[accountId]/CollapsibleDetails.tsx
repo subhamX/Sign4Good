@@ -6,7 +6,11 @@ import { useState } from "react";
 export function CollapsibleDetails({ 
   envelope
 }: { 
-  envelope: any
+  envelope: {
+    briefDescription: string | null;
+    isProcessed: boolean;
+    isFundingDocument: boolean;
+  }
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -54,11 +58,3 @@ export function CollapsibleDetails({
     </div>
   );
 }
-import { getUserInServer } from "@/app/utils/setAuthTokenAsCookie";
-import { db } from "@/drizzle/db-config";
-import { accounts, monitoredEnvelopes } from "@/drizzle/schema";
-import { LANDING_ROUTE } from "@/routes.config";
-import { and, eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
-import { getEnvelopes } from "./envelopes.server";
-
