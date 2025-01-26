@@ -7,6 +7,7 @@ import { LANDING_ROUTE } from "@/routes.config";
 import { CollapsibleDetails } from "./CollapsibleDetails";
 import { HyperText } from "@/components/ui/hypertext";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { Import } from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
@@ -99,7 +100,8 @@ export default async function AccountDashboard({
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Monitored Documents</h2>
           <a href={`/dash/${accountId}/import`} className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            Import Documents
+            Import Documents 
+            <Import className="w-5 h-5 ml-2 group-hover:text-white" />
           </a>
         </div>
         <div className="grid gap-6">
