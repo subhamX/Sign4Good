@@ -1,6 +1,6 @@
 import { db } from '@/drizzle/db-config';
 import { accounts, monitoredEnvelopes, complianceForms } from '@/drizzle/schema';
-import { eq, sql } from 'drizzle-orm';
+import { count, eq, lt, sql, sum } from 'drizzle-orm';
 import { Trophy, DollarSign, FileCheck, Clock, Heart } from 'lucide-react';
 
 type LeaderboardEntry = {
@@ -15,60 +15,43 @@ type LeaderboardEntry = {
 };
 
 async function calculateLeaderboardData(): Promise<LeaderboardEntry[]> {
-  const eligibleAccounts = await db
-    .select({
-      docuSignAccountId: accounts.docuSignAccountId,
-      docuSignAccountName: accounts.docuSignAccountName,
-      donationLink: accounts.donationLink,
-    })
+  const fundingData = await db.select({
+    // monitoredEnvelopes: monitoredEnvelopes,
+    account: accounts,
+    numberOfComplianceForms: count(complianceForms.id),
+    numberOfComplianceFormsOnTime: count(lt(complianceForms.filledByComplianceOfficerAt, complianceForms.dueDate)),
+    totalMoneyReceivedTillDate: sum(monitoredEnvelopes.moneyReceivedTillDate).mapWith(Number)
+  })
     .from(accounts)
-    .where(eq(accounts.includeInLeaderBoard, true));
+    .leftJoin(monitoredEnvelopes, eq(monitoredEnvelopes.accountId, accounts.docuSignAccountId))
+    .leftJoin(complianceForms, eq(monitoredEnvelopes.envelopeId, complianceForms.envelopeId))
+    .groupBy(
+      accounts.docuSignAccountId,
+      accounts.docuSignAccountName,
+      accounts.donationLink,
+    )
+    .where(eq(accounts.includeInLeaderBoard, false));
 
-  const leaderboardData = await Promise.all(
-    eligibleAccounts.map(async (account) => {
-      const fundingData = await db
-        .select({
-          totalFunding: sql<number>`COALESCE(sum(${monitoredEnvelopes.moneyReceivedTillDate}), 0)`,
-          documentCount: sql<number>`count(*)`
-        })
-        .from(monitoredEnvelopes)
-        .where(eq(monitoredEnvelopes.accountId, account.docuSignAccountId));
 
-      const complianceData = await db
-        .select({
-          totalForms: sql<number>`count(*)`,
-          onTimeForms: sql<number>`sum(case when ${complianceForms.filledByComplianceOfficerAt} <= ${complianceForms.dueDate} then 1 else 0 end)`
-        })
-        .from(complianceForms)
-        .innerJoin(
-          monitoredEnvelopes,
-          eq(complianceForms.envelopeId, monitoredEnvelopes.envelopeId)
-        )
-        .where(eq(monitoredEnvelopes.accountId, account.docuSignAccountId));
+  console.log(fundingData);
 
-      const score = complianceData[0].totalForms > 0
-        ? Math.round((complianceData[0].onTimeForms / complianceData[0].totalForms) * 10000) / 100
-        : 0;
-
-      return {
-        accountId: account.docuSignAccountId,
-        name: account.docuSignAccountName,
-        donationLink: account.donationLink,
-        totalFunding: Number(fundingData[0].totalFunding),
-        fundingDocuments: Number(fundingData[0].documentCount),
-        complianceForms: Number(complianceData[0].totalForms),
-        onTimeComplianceForms: Number(complianceData[0].onTimeForms),
-        score
-      };
-    })
-  );
-
-  return leaderboardData.sort((a, b) => b.score - a.score);
+  return fundingData.map(e => {
+    return {
+      accountId: e.account.docuSignAccountId,
+      name: e.account.docuSignAccountName,
+      donationLink: e.account.donationLink,
+      totalFunding: e.totalMoneyReceivedTillDate,
+      fundingDocuments: e.numberOfComplianceForms,
+      complianceForms: e.numberOfComplianceForms,
+      onTimeComplianceForms: e.numberOfComplianceFormsOnTime,
+      score: e.numberOfComplianceForms > 0 ? (e.numberOfComplianceFormsOnTime / e.numberOfComplianceForms) * 100 : 0
+    }
+  }).sort((a, b) => b.score - a.score);
 }
 
 export default async function LeaderboardPage() {
   const leaderboardData = await calculateLeaderboardData();
-
+  console.log(leaderboardData);
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header Section */}
@@ -97,7 +80,7 @@ export default async function LeaderboardPage() {
                 <Heart className="w-5 h-5" />
                 <h3 className="font-semibold">Support Our Mission</h3>
               </div>
-              
+
               <p className="text-sm text-muted-foreground">
                 Your contribution helps NGOs maintain transparency and achieve greater impact
               </p>
@@ -110,7 +93,7 @@ export default async function LeaderboardPage() {
                   className="group flex items-center gap-2 px-6 py-2.5 bg-[#059940] hover:bg-[#03600c] 
                     text-white rounded-md transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  <img 
+                  <img
                     src="https://cdn-icons-png.flaticon.com/512/174/174861.png"
                     alt="PayPal"
                     className="w-5 h-5"
@@ -169,7 +152,7 @@ export default async function LeaderboardPage() {
             <h3 className="font-semibold">Compliance Rate</h3>
           </div>
           <p className="text-2xl font-bold">
-            {Math.round(leaderboardData.reduce((sum, org) => sum + org.onTimeComplianceForms, 0) / 
+            {Math.round(leaderboardData.reduce((sum, org) => sum + org.onTimeComplianceForms, 0) /
               Math.max(leaderboardData.reduce((sum, org) => sum + org.complianceForms, 0), 1) * 100)}%
           </p>
           <p className="text-sm text-muted-foreground">Average on-time rate</p>
@@ -196,10 +179,10 @@ export default async function LeaderboardPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full 
-                        ${index === 0 ? 'bg-yellow-100 text-yellow-800' : 
-                          index === 1 ? 'bg-gray-100 text-gray-800' : 
-                          index === 2 ? 'bg-amber-100 text-amber-800' : 
-                          'bg-muted/50 text-muted-foreground'}`}>
+                        ${index === 0 ? 'bg-yellow-100 text-yellow-800' :
+                          index === 1 ? 'bg-gray-100 text-gray-800' :
+                            index === 2 ? 'bg-amber-100 text-amber-800' :
+                              'bg-muted/50 text-muted-foreground'}`}>
                         {index + 1}
                       </span>
                     </div>
@@ -210,7 +193,7 @@ export default async function LeaderboardPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-primary">{entry.score}%</div>
                     <div className="w-full bg-muted/30 rounded-full h-1.5 mt-1">
-                      <div 
+                      <div
                         className="bg-primary rounded-full h-1.5 transition-all duration-500"
                         style={{ width: `${entry.score}%` }}
                       />
@@ -231,7 +214,7 @@ export default async function LeaderboardPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <a 
+                    <a
                       href={entry.donationLink}
                       target="_blank"
                       rel="noopener noreferrer"
