@@ -128,20 +128,24 @@ export async function fetchFormFields(contractText: string) {
         apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const prompt = `Imagine you are a meticulous Compliance Officer tasked with creating a standardized reporting template for a new organizational partnership. Analyze the provided contract text with the following objectives:
+    const prompt = `Imagine you are a professional and meticulous Compliance Officer tasked with creating a standardized reporting template for a new organizational partnership. Analyze the provided contract text with the following objectives:
 
-  1. Identify key compliance requirements and reporting obligations
-  2. Extract stakeholder information without relying on specific company names
-  3. Determine critical verification points that ensure partnership integrity
-  4. Generate form fields that capture essential compliance data
+        1. Identify key compliance requirements and reporting obligations
+        2. Extract stakeholder information without relying on specific company names
+        3. Determine critical verification points that ensure partnership integrity
+        4. Generate form fields that capture essential compliance data
 
-  Your form fields should:
-  - Be generic enough to work across different organizational contexts
-  - Focus on universal compliance principles
-  - Use clear, professional language
-  - Provide guidance through placeholders and descriptions
-  - Offer flexibility for various partnership types
-  - Indicate which fields require proof documentation
+        Your form fields should:
+        - Be generic enough to work across different organizational contexts
+        - Focus on universal compliance principles
+        - Use clear, professional language
+        - Provide guidance through placeholders and descriptions
+        - Offer flexibility for various partnership types
+        - Indicate which fields require proof documentation
+        - Reminders about donation clauses and inquire progress to achivement
+        - Extract the Amount of funding till date
+        - Brief summary of the entire document
+        - Also mention jurisdiction based compliance requirements that may not have been covered in the document
 
   Create form fields and return them in a JSON object with this structure:
   {

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { DASH_ACCOUNT_ROUTE } from "@/routes.config";
 import { useState, useEffect } from "react";
+import { ThemeToggle } from "./theme-toggle";
 
 export const ClientNavbar = ({
     user,
@@ -49,6 +50,7 @@ export const ClientNavbar = ({
                 <div className="flex items-center gap-2">
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center gap-2">
+                        <ThemeToggle />
                         {user && (
                             <>
                                 <Link href="/leaderboard">
@@ -80,6 +82,7 @@ export const ClientNavbar = ({
 
                     {/* Mobile Menu */}
                     <div className="md:hidden flex items-center gap-2">
+                        <ThemeToggle />
                         {/* Select NGO Button */}
                         {user && connectedNGOs.length > 0 && (
                             <div className="flex items-center">
