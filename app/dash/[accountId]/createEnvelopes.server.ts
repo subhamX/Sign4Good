@@ -5,13 +5,13 @@ import { db } from '@/drizzle/db-config';
 import { monitoredEnvelopes } from '@/drizzle/schema';
 import { DASH_ACCOUNT_IMPORT_ROUTE } from '@/routes.config';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { getEnvelopes } from './envelopes.server';
 
 const envelopeSchema = z.object({
   envelopeId: z.string(),
-  complianceOfficerEmail: z.string().email(),
-  donorOfficerEmail: z.string().email(),
+  complianceOfficerEmail: z.string().email({message: "Invalid compliance officer email address"}),
+  donorOfficerEmail: z.string().email({message: "Invalid donor officer email address"}),
   monitoringFrequencyDays: z.number().int().min(1),
 });
 
@@ -69,10 +69,10 @@ export async function createEnvelopesServerAction(formData: z.infer<typeof reque
     return {
       message: 'Envelopes created successfully',
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error monitoring envelopes:', error);
     return {
-      error: 'Failed to monitor envelopes',
+      error: error instanceof ZodError ? error.errors[0].message : (error instanceof Error ? error.message : 'Unknown error'),
     }
   }
 } 

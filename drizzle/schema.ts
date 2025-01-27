@@ -1,5 +1,7 @@
 import { EnvelopeDocuSign } from '@/app/dash/[accountId]/envelopes.server';
 import { pgTable, serial, text, timestamp, integer, boolean, jsonb, primaryKey } from 'drizzle-orm/pg-core';
+import { SignForGoodWebFormTypeUnion, SignForGoodWebFormTypeUnionType } from '@/app/crons/createFormsAndStoreInDb';
+import { z } from 'zod';
 
 // Users table to store DocuSign authenticated users
 export const users = pgTable('users', {
@@ -42,7 +44,7 @@ export const monitoredEnvelopes = pgTable('monitored_envelopes', {
   accountId: text('account_id').references(() => accounts.docuSignAccountId).notNull(),
   complianceOfficerEmail: text('compliance_officer_email').notNull(),
   donorOfficerEmail: text('donor_officer_email').notNull(),
-  monitoringFrequencyDays: integer('monitoring_frequency_days').default(14).notNull(),
+  monitoringFrequencyDays: integer('monitoring_frequency_days').notNull(),
 
   nextReviewDate: timestamp('next_review_date').notNull(),
 
@@ -64,17 +66,20 @@ export const monitoredEnvelopes = pgTable('monitored_envelopes', {
 export const complianceForms = pgTable('compliance_forms', {
   id: serial('id').primaryKey(),
   envelopeId: text('envelope_id').references(() => monitoredEnvelopes.envelopeId).notNull(),
-  formData: jsonb('form_data').notNull(),
+  formData: jsonb('form_data').$type<SignForGoodWebFormTypeUnionType[]>().notNull(),
 
   isCompleted: boolean('is_completed').default(false).notNull(),
-  dueDate: timestamp('due_date').notNull(),
 
-  filledAtByComplianceOfficer: timestamp('filled_at_by_compliance_officer'),
-  signedAtByDonor: timestamp('signed_at_by_donor'),
 
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  emailSentAt: timestamp('email_sent_at').defaultNow().notNull(),
-  createdBy: text('created_by').references(() => users.docusignId).notNull(),
+
+  dueDate: timestamp('due_date', {mode: 'string'}).notNull(),
+  createdAt: timestamp('created_at', {mode: 'string'}).defaultNow().notNull(),
+  filledByComplianceOfficerAt: timestamp('filled_by_compliance_officer_at', {mode: 'string'}),
+  signedByDonorAt: timestamp('signed_by_donor_at', {mode: 'string'}),
+
+
+  // emailSentAt: timestamp('email_sent_at', {mode: 'string'}).defaultNow().notNull(),
+  // createdBy: text('created_by').references(() => users.docusignId).notNull(),
 });
 
 

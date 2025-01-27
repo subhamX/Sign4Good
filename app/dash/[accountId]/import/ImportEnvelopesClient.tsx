@@ -29,7 +29,7 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
     envelopeId: envelope.envelopeId,
     complianceOfficerEmail: envelope.sender.email,
     donorOfficerEmail: '',
-    monitoringFrequencyDays: 14,
+    monitoringFrequencyDays: 60,
   }])));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [complianceOfficerEmail, setComplianceOfficerEmail] = useState('');
@@ -108,7 +108,7 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
         envelopeId,
         complianceOfficerEmail: '',
         donorOfficerEmail: '',
-        monitoringFrequencyDays: 14,
+        monitoringFrequencyDays: 60,
       };
       newSettings.set(envelopeId, { ...current, [field]: value });
       return newSettings;
@@ -203,7 +203,7 @@ export default function ImportEnvelopesClient({ envelopes, accountId }: Props) {
                         <Input
                           type="number"
                           min="1"
-                          value={settings?.monitoringFrequencyDays || 14}
+                          value={settings?.monitoringFrequencyDays}
                           onChange={(e) => updateEnvelopeSetting(envelope.envelopeId, 'monitoringFrequencyDays', parseInt(e.target.value))}
                           className="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
