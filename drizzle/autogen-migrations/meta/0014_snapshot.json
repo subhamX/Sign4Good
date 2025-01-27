@@ -1,0 +1,398 @@
+{
+  "id": "aaf4ca14-aa52-4a6b-919f-30c3633bfeda",
+  "prevId": "266bebc3-0fdb-4248-9655-4000baa692a5",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.enterprise_info": {
+      "name": "enterprise_info",
+      "schema": "",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "docu_sign_account_id": {
+          "name": "docu_sign_account_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "docu_sign_base_url": {
+          "name": "docu_sign_base_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "donation_link": {
+          "name": "donation_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": -1
+        },
+        "include_in_leader_board": {
+          "name": "include_in_leader_board",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.compliance_forms": {
+      "name": "compliance_forms",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "envelope_id": {
+          "name": "envelope_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "form_data": {
+          "name": "form_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submitted_form_data": {
+          "name": "submitted_form_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "filled_by_compliance_officer_at": {
+          "name": "filled_by_compliance_officer_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email_sent_to_donor_at": {
+          "name": "email_sent_to_donor_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signed_by_donor_at": {
+          "name": "signed_by_donor_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "compliance_forms_envelope_id_monitored_envelopes_envelope_id_fk": {
+          "name": "compliance_forms_envelope_id_monitored_envelopes_envelope_id_fk",
+          "tableFrom": "compliance_forms",
+          "tableTo": "monitored_envelopes",
+          "columnsFrom": [
+            "envelope_id"
+          ],
+          "columnsTo": [
+            "envelope_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.monitored_envelopes": {
+      "name": "monitored_envelopes",
+      "schema": "",
+      "columns": {
+        "envelope_id": {
+          "name": "envelope_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "compliance_officer_email": {
+          "name": "compliance_officer_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "donor_officer_email": {
+          "name": "donor_officer_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "monitoring_frequency_days": {
+          "name": "monitoring_frequency_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "next_review_date": {
+          "name": "next_review_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_processed": {
+          "name": "is_processed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "money_received_till_date": {
+          "name": "money_received_till_date",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "brief_description": {
+          "name": "brief_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "additional_info": {
+          "name": "additional_info",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "monitored_envelopes_account_id_enterprise_info_docu_sign_account_id_fk": {
+          "name": "monitored_envelopes_account_id_enterprise_info_docu_sign_account_id_fk",
+          "tableFrom": "monitored_envelopes",
+          "tableTo": "enterprise_info",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "docu_sign_account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "monitored_envelopes_created_by_users_docusign_id_fk": {
+          "name": "monitored_envelopes_created_by_users_docusign_id_fk",
+          "tableFrom": "monitored_envelopes",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "docusign_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "docusign_id": {
+          "name": "docusign_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_docusign_id_unique": {
+          "name": "users_docusign_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "docusign_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users_to_accounts_bridge": {
+      "name": "users_to_accounts_bridge",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "users_to_accounts_bridge_user_id_users_docusign_id_fk": {
+          "name": "users_to_accounts_bridge_user_id_users_docusign_id_fk",
+          "tableFrom": "users_to_accounts_bridge",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "docusign_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "users_to_accounts_bridge_account_id_enterprise_info_docu_sign_account_id_fk": {
+          "name": "users_to_accounts_bridge_account_id_enterprise_info_docu_sign_account_id_fk",
+          "tableFrom": "users_to_accounts_bridge",
+          "tableTo": "enterprise_info",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "docu_sign_account_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "users_to_accounts_bridge_user_id_account_id_pk": {
+          "name": "users_to_accounts_bridge_user_id_account_id_pk",
+          "columns": [
+            "user_id",
+            "account_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

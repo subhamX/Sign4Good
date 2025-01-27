@@ -1,0 +1,1 @@
+ALTER TABLE "compliance_forms" ADD COLUMN "submitted_form_data" jsonb;

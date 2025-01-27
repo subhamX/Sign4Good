@@ -15,12 +15,12 @@ export async function createFormAndStoreInDb(envelopeId: string, dueDate: dayjs.
 
     const text = await parsePDF(file);
     console.log(text);
-    const fields = await fetchFormFields(text);
-    console.log(fields);
+    const generatedSchema = await fetchFormFields(text);
+    console.log(generatedSchema);
 
     await db.insert(complianceForms).values({
         envelopeId: envelopeId,
-        formData: fields,
+        generatedSchema,
         createdAt: dayjs().toISOString(),
         dueDate: dueDate.toISOString(),
     })

@@ -1,0 +1,1 @@
+ALTER TABLE "compliance_forms" ADD COLUMN "email_sent_to_donor_envelope_id" text;

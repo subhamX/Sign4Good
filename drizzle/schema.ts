@@ -1,7 +1,7 @@
-import { SignForGoodWebFormTypeUnionType } from '@/app/crons/utils/pdfToForm';
+import { FormField } from '@/app/crons/utils/pdfToForm';
 import { EnvelopeDocuSign } from '@/app/dash/[accountId]/envelopes.server';
 import { pgTable, serial, text, timestamp, integer, boolean, jsonb, primaryKey } from 'drizzle-orm/pg-core';
-import { z } from 'zod';
+
 
 // Users table to store DocuSign authenticated users
 export const users = pgTable('users', {
@@ -66,20 +66,20 @@ export const monitoredEnvelopes = pgTable('monitored_envelopes', {
 export const complianceForms = pgTable('compliance_forms', {
   id: serial('id').primaryKey(),
   envelopeId: text('envelope_id').references(() => monitoredEnvelopes.envelopeId).notNull(),
-  formData: jsonb('form_data').$type<SignForGoodWebFormTypeUnionType[]>().notNull(),
 
-  isCompleted: boolean('is_completed').default(false).notNull(),
+  generatedSchema: jsonb('form_data').$type<FormField[]>().notNull(),
+  submittedFormData: jsonb('submitted_form_data').$type<Record<string, any>>(),
+
+  // isCompleted: boolean('is_completed').default(false).notNull(),
 
 
 
   dueDate: timestamp('due_date', {mode: 'string'}).notNull(),
   createdAt: timestamp('created_at', {mode: 'string'}).defaultNow().notNull(),
   filledByComplianceOfficerAt: timestamp('filled_by_compliance_officer_at', {mode: 'string'}),
+  emailSentToDonorAt: timestamp('email_sent_to_donor_at', {mode: 'string'}),
+  emailSentToDonorEnvelopeId: text('email_sent_to_donor_envelope_id'),
   signedByDonorAt: timestamp('signed_by_donor_at', {mode: 'string'}),
-
-
-  // emailSentAt: timestamp('email_sent_at', {mode: 'string'}).defaultNow().notNull(),
-  // createdBy: text('created_by').references(() => users.docusignId).notNull(),
 });
 
 

@@ -4,8 +4,8 @@ import docusign from 'docusign-esign';
 import { eq } from 'drizzle-orm';
 import { db } from '@/drizzle/db-config';
 import { users, accounts, usersToAccountsBridgeTable } from '@/drizzle/schema';
-import { DOCUMENT_TYPE_KEY } from './envelopes.config';
-import { DOCUMENT_TYPE_VALUE } from './envelopes.config';
+import { DOCUMENT_TYPE_KEY } from '../../dash/[accountId]/envelopes.config';
+import { DOCUMENT_TYPE_VALUE } from '../../dash/[accountId]/envelopes.config';
 
 
 
@@ -13,29 +13,13 @@ import { DOCUMENT_TYPE_VALUE } from './envelopes.config';
 export async function sendEnvelope(
   accountId: string,
   signerEmail: string,
-  signerName: string
+  pdfPath: string,
+  accessToken: string
 ) {
   try {
-    // 1) Find a user that has an access token for this specific accountId
-    //    (assuming your 'usersToAccountsBridgeTable' links DocuSign accounts to users)
-    const userRecord = await db
-      .select()
-      .from(users)
-      .innerJoin(
-        usersToAccountsBridgeTable,
-        eq(usersToAccountsBridgeTable.userId, users.docusignId)
-      )
-      .innerJoin(accounts, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
-      .where(eq(accounts.docuSignAccountId, accountId));
 
-    if (!userRecord.length) {
-      throw new Error(`No user found for accountId=${accountId}`);
-    }
+    const signerName = signerEmail.split("@")[0];
 
-    const { accessToken } = userRecord[0].users;
-    if (!accessToken) {
-      throw new Error(`User does not have a stored access token for accountId=${accountId}`);
-    }
 
     // 2) Configure the DocuSign API Client
     const apiClient = new docusign.ApiClient();
@@ -49,7 +33,6 @@ export async function sendEnvelope(
 
     // 3) Load your PDF and convert to Base64
     //    Suppose it lives at ./app/dash/[accountId]/documents/sample_contract.pdf
-    const pdfPath = path.join(process.cwd(), 'app/dash/[accountId]', 'sample_contract.pdf');
     const pdfBytes = fs.readFileSync(pdfPath);
     const pdfBase64 = Buffer.from(pdfBytes).toString('base64');
 
@@ -127,16 +110,9 @@ export async function sendEnvelope(
     
     return {
       envelopeId: results.envelopeId,
-      message: 'Envelope sent successfully',
     };
   } catch (error) {
     console.error('Error sending envelope:', error);
     throw error;
   }
 }
-
-await sendEnvelope(
-  "3c51dad6-1384-4905-925e-decceaf0e375",
-  "gaurangruparelia007@gmail.com", // donor email
-  "Gaurang" // donor name
-)

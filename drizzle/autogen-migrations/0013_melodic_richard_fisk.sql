@@ -1,0 +1,1 @@
+ALTER TABLE "compliance_forms" ALTER COLUMN "submitted_form_data" DROP NOT NULL;

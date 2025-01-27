@@ -115,7 +115,7 @@ export const FormFieldSchema = z.object({
     proof_description: z.string().optional(),
 }).and(SignForGoodWebFormTypeUnion);
 
-export type SignForGoodWebFormTypeUnionType = z.infer<typeof SignForGoodWebFormTypeUnion>;
+// type SignForGoodWebFormTypeUnionType = z.infer<typeof SignForGoodWebFormTypeUnion>;
 
 export type FormField = z.infer<typeof FormFieldSchema>;
 
@@ -123,7 +123,7 @@ const FormFieldsResponseSchema = z.array(FormFieldSchema);
 
 
 
-export async function fetchFormFields(contractText: string) {
+export async function fetchFormFields(contractText: string): Promise<FormField[]> {
     const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
     });
