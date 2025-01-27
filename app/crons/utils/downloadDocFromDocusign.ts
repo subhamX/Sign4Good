@@ -2,9 +2,9 @@ import { eq } from "drizzle-orm";
 import { db } from "@/drizzle/db-config";
 import { accounts, monitoredEnvelopes, users, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import docusign from 'docusign-esign';
+import os from 'os';
 
-export const processDocument = async (envelopeId: string) => {
+export const downloadDocFromDocusign = async (envelopeId: string) => {
   console.log("Processing document for envelopeId:", envelopeId);
 
   // 1. Fetch the envelope record from the DB
@@ -35,25 +35,21 @@ export const processDocument = async (envelopeId: string) => {
 
   console.log("Access token:", userInDb.users.accessToken);
 
-  // 3. Configure DocuSign client
-  const dsApiClient = new docusign.ApiClient();
-  // For production or other environments, adjust base path accordingly
-  dsApiClient.setBasePath("https://account-d.docusign.com/restapi");
-  dsApiClient.addDefaultHeader("Authorization", "Bearer " + userInDb.users.accessToken);
 
-  const envelopesApi = new docusign.EnvelopesApi(dsApiClient);
+  const response = await fetch(`https://demo.docusign.net/restapi/v2/accounts/${envelope[0].accountId}/envelopes/${envelopeId}/documents/combined`, {
+    headers: {
+      'Authorization': `Bearer ${userInDb.users.accessToken}`,
+    },
+  });
 
-  // 4. Retrieve the combined documents as a single PDF
-  // 'combined' is a valid documentId for the combined doc
-  const fileBytes = await envelopesApi.getDocument(
-    envelope[0].accountId,
-    envelopeId,
-    "combined",
-    {}
-  );
+  console.log('response', response)
+
+  const fileBytes = await response.arrayBuffer();
 
   // 5. Prepare a local directory for the file
-  const documentsDir = "./app/dash/[accountId]/documents";
+
+  const baseDir = os.tmpdir();
+  const documentsDir = `${baseDir}/documents`;
   if (!existsSync(documentsDir)) {
     mkdirSync(documentsDir, { recursive: true });
   }
@@ -61,19 +57,10 @@ export const processDocument = async (envelopeId: string) => {
   // 6. Write the file to disk
   const tempFilePath = `${documentsDir}/${envelopeId}.pdf`;
   // According to the DocuSign Node SDK docs, `getDocument` returns file data (typically a Buffer).
-  writeFileSync(tempFilePath, fileBytes, { encoding: "binary" });
+  writeFileSync(tempFilePath, Buffer.from(fileBytes));
 
   console.log(`PDF saved to ${tempFilePath}`);
 
-  // Additional logic could happen here, e.g. updating DB references, etc.
-
-  // When processing documents, you might want to handle both officers
-//   const { complianceOfficerEmail, donorOfficerEmail } = envelope[0];
-
-  // Add logic to handle both officers in your document processing
-  // This might include creating signature fields for both officers
-  // or handling their responses separately
+  return tempFilePath;
 };
 
-
-await processDocument("21d6b2ee-507d-4a15-b8b2-efe0ee41bae5");

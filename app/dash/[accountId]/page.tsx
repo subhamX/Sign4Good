@@ -48,7 +48,7 @@ export default async function AccountDashboard({
     db
       .select({
         envelopeId: complianceForms.envelopeId,
-        emailSentAt: complianceForms.emailSentAt,
+        createdAt: complianceForms.createdAt,
         rn: sql`ROW_NUMBER() OVER (PARTITION BY ${complianceForms.envelopeId} ORDER BY ${complianceForms.dueDate} DESC)`.as("rn")
       })
       .from(complianceForms)
@@ -277,8 +277,8 @@ export default async function AccountDashboard({
                                   <p className="font-medium text-gray-700">Compliance Officer</p>
                                   <p>{envelope.complianceOfficerEmail}</p>
                                   <p className="text-xs text-gray-500 mt-1">
-                                    Last notified: {mostRecentComplianceForms?.emailSentAt ? 
-                                      new Date(mostRecentComplianceForms.emailSentAt).toLocaleString() : 
+                                    Last notified: {mostRecentComplianceForms?.createdAt ? 
+                                      new Date(mostRecentComplianceForms.createdAt).toLocaleString() : 
                                       'Never'}
                                   </p>
                                 </div>
