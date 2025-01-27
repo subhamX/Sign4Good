@@ -129,7 +129,7 @@ async function DashboardPage() {
               <div className="flex items-center gap-3 md:gap-4">
                 <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                 <div>
-                  <p className="text-xl md:text-2xl font-bold">${stats[0].totalFunding}</p>
+                  <p className="text-xl md:text-2xl font-bold">${stats[0].totalFunding.toLocaleString()}</p>
                   <p className="text-xs md:text-sm text-muted-foreground">Funds Tracked</p>
                 </div>
               </div>

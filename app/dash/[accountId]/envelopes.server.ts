@@ -100,7 +100,7 @@ export async function getEnvelopes(accountId: string): Promise<{ envelopes?: Env
             }
         }
 
-        const envelopes = data.envelopes as EnvelopeDocuSign[];
+        const envelopes = (data?.envelopes?? []) as EnvelopeDocuSign[];
         // /restapi/v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields
 
         const promises = envelopes.map(async (envelope: EnvelopeDocuSign) => {

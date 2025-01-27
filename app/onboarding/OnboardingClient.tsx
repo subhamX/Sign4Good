@@ -86,7 +86,7 @@ export default function OnboardingClient({
                         </h1>
                     </div>
                     <p className="text-xl text-muted-foreground/90">
-                        Connect your DocuSign accounts and empower your NGO's digital presence
+                       Here is the list of DocuSign organizations you have access to. Connect your DocuSign accounts and empower your NGO's digital presence
                     </p>
                     <div className="h-1.5 w-24 bg-gradient-to-r from-primary via-primary/50 to-transparent mx-auto rounded-full" />
                 </div>

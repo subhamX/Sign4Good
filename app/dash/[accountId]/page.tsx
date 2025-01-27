@@ -100,7 +100,7 @@ export default async function AccountDashboard({
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Monitored Documents</h2>
+          <h2 className="text-xl font-semibold">Donation Agreements</h2>
           <a href={`/dash/${accountId}/import`} className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
             Import Documents
             <Import className="w-5 h-5 ml-2 group-hover:text-white" />

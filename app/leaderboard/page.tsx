@@ -30,7 +30,7 @@ async function calculateLeaderboardData(): Promise<LeaderboardEntry[]> {
       accounts.docuSignAccountName,
       accounts.donationLink,
     )
-    .where(eq(accounts.includeInLeaderBoard, false));
+    // .where(eq(accounts.includeInLeaderBoard, false));
 
 
   console.log(fundingData);
@@ -120,7 +120,7 @@ export default async function LeaderboardPage() {
             <Trophy className="w-5 h-5 text-primary" />
             <h3 className="font-semibold">Top Score</h3>
           </div>
-          <p className="text-2xl font-bold">{leaderboardData[0]?.score || 0}%</p>
+          <p className="text-2xl font-bold">{(leaderboardData[0]?.score || 0).toFixed(2)}%</p>
           <p className="text-sm text-muted-foreground">{leaderboardData[0]?.name || 'No data'}</p>
         </div>
 
@@ -152,8 +152,8 @@ export default async function LeaderboardPage() {
             <h3 className="font-semibold">Compliance Rate</h3>
           </div>
           <p className="text-2xl font-bold">
-            {Math.round(leaderboardData.reduce((sum, org) => sum + org.onTimeComplianceForms, 0) /
-              Math.max(leaderboardData.reduce((sum, org) => sum + org.complianceForms, 0), 1) * 100)}%
+            {(Math.round(leaderboardData.reduce((sum, org) => sum + org.onTimeComplianceForms, 0) /
+              Math.max(leaderboardData.reduce((sum, org) => sum + org.complianceForms, 0), 1) * 100).toFixed(2))}%
           </p>
           <p className="text-sm text-muted-foreground">Average on-time rate</p>
         </div>
@@ -191,7 +191,7 @@ export default async function LeaderboardPage() {
                     <div className="text-sm font-medium">{entry.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-primary">{entry.score}%</div>
+                    <div className="text-sm font-semibold text-primary">{entry.score.toFixed(2)}%</div>
                     <div className="w-full bg-muted/30 rounded-full h-1.5 mt-1">
                       <div
                         className="bg-primary rounded-full h-1.5 transition-all duration-500"

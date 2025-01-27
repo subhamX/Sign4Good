@@ -125,12 +125,14 @@ export function HyperText({
       ref={elementRef}
       className={cn("overflow-hidden py-2 text-4xl font-bold", className)}
       onMouseEnter={handleAnimationTrigger}
+      suppressHydrationWarning
       {...props}
     >
       <AnimatePresence>
         {displayText.map((letter, index) => (
           <motion.span
             key={index}
+            suppressHydrationWarning
             className={cn("font-mono", letter === " " ? "w-3" : "")}
           >
             {letter.toUpperCase()}
