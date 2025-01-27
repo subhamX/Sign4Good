@@ -119,17 +119,29 @@ export const FormFieldSchema = z.object({
 
 export type FormField = z.infer<typeof FormFieldSchema>;
 
-const FormFieldsResponseSchema = z.array(FormFieldSchema);
+export const FormFieldsResponseSchema = z.object({
+    summary: z.string(),
+    total_funding_till_date_in_cents: z.string(),
+    announcements: z.array(z.string()),
+    fields: z.array(FormFieldSchema),
+});
 
 
 
-export async function fetchFormFields(contractText: string): Promise<FormField[]> {
+
+export async function fetchFormFields(contractText: string): Promise<{
+    summary: string,
+    total_funding_till_date_in_cents: string,
+    announcements: string[],
+    fields: FormField[],
+}> {
     const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
     });
 
-    const prompt = `Imagine you are a professional and meticulous Compliance Officer tasked with creating a standardized reporting template for a new organizational partnership. Analyze the provided contract text with the following objectives:
-
+    const prompt = `Imagine you are a professional and meticulous Compliance Officer tasked with creating a standardized reporting template for a new organizational partnership. 
+    
+    Analyze the provided contract text with the following objectives:
         1. Identify key compliance requirements and reporting obligations
         2. Extract stakeholder information without relying on specific company names
         3. Determine critical verification points that ensure partnership integrity
@@ -147,66 +159,70 @@ export async function fetchFormFields(contractText: string): Promise<FormField[]
         - Brief summary of the entire document
         - Also mention jurisdiction based compliance requirements that may not have been covered in the document
 
-  Create form fields and return them in a JSON object with this structure:
+  Create form fields and return them in a JSON object with this structure. Just return the JSON object, no other text or comments.
+
   {
-    "fields": [
-      {
-        "label": "Human readable label",
-        "name": "machine_readable_name", // only letters, numbers, underscores
-        "description": "Optional help text explaining the field",
-        "type": "text_field" | "textarea" | "number_field" | "date_field" | "checkbox" | "single_select" | "multi_select",
-        "placeholder": "Helpful placeholder text",
-        "proof_required": boolean,
-        "proof_description": "What kind of proof is needed",
-        
-        // For text_field/textarea:
-        "validation": {
-          "required": boolean,
-          "min_length": number,
-          "max_length": number,
-          "pattern": "regex pattern",
-          "custom_error": "Custom error message"
-        },
+   "summary": "Brief summary of the contract",
+   "total_funding_till_date_in_cents": "Amount of funding till date in cents",
+   "announcements": "recent announcements in the document. provide a list of strings",
+   "fields": [
+        {
+            "label": "Human readable label",
+            "name": "machine_readable_name", // only letters, numbers, underscores
+            "description": "Optional help text explaining the field",
+            "type": "text_field" | "textarea" | "number_field" | "date_field" | "checkbox" | "single_select" | "multi_select",
+            "placeholder": "Helpful placeholder text",
+            "proof_required": boolean,
+            "proof_description": "What kind of proof is needed",
+            
+            // For text_field/textarea:
+            "validation": {
+                "required": boolean,
+                "min_length": number,
+                "max_length": number,
+                "pattern": "regex pattern",
+                "custom_error": "Custom error message"
+            },
 
-        // For number_field:
-        "validation": {
-          "required": boolean,
-          "min": number,
-          "max": number,
-          "integer_only": boolean,
-          "custom_error": "Custom error message"
-        },
+            // For number_field:
+            "validation": {
+                "required": boolean,
+                "min": number,
+                "max": number,
+                "integer_only": boolean,
+                "custom_error": "Custom error message"
+            },
 
-        // For date_field:
-        "validation": {
-          "required": boolean,
-          "min_date": "2024-01-01T00:00:00.000Z", // ISO 8601 format example
-          "max_date": "2025-12-31T23:59:59.999Z", // ISO 8601 format example
-          "future_only": boolean,
-          "past_only": boolean,
-          "custom_error": "Custom error message"
-        },
+            // For date_field:
+            "validation": {
+                "required": boolean,
+                "min_date": "2024-01-01T00:00:00.000Z", // ISO 8601 format example
+                "max_date": "2025-12-31T23:59:59.999Z", // ISO 8601 format example
+                "future_only": boolean,
+                "past_only": boolean,
+                "custom_error": "Custom error message"
+            },
 
-        // For single_select/multi_select:
-        "options": ["option1", "option2", ...],
-        "validation": {
-          "required": boolean,
-          "min_selections": number, // for multi_select
-          "max_selections": number, // for multi_select
-          "custom_error": "Custom error message"
-        },
-        "default_value": "option1", // for single_select
-        "default_values": ["option1", "option2"], // for multi_select
+            // For single_select/multi_select:
+            "options": ["option1", "option2", ...],
+            "validation": {
+                "required": boolean,
+                "min_selections": number, // for multi_select
+                "max_selections": number, // for multi_select
+                "custom_error": "Custom error message"
+            },
+            "default_value": "option1", // for single_select
+            "default_values": ["option1", "option2"], // for multi_select
 
-        // For checkbox:
-        "validation": {
-          "required": boolean,
-          "custom_error": "Custom error message"
-        },
-        "default": boolean
-      }
-    ]
-  }
+            // For checkbox:
+            "validation": {
+                "required": boolean,
+                "custom_error": "Custom error message"
+            },
+            "default": boolean
+        }
+        ]
+    }
 
   Contract Text to Analyze:
   ${contractText}`;
@@ -223,20 +239,22 @@ export async function fetchFormFields(contractText: string): Promise<FormField[]
             throw new Error("No content received from OpenAI");
         }
 
-        console.log("Raw OpenAI response:", content);
-
         const parsedContent = JSON.parse(content);
         // Expect the fields to be in a 'fields' property of the response
         const fields = parsedContent.fields;
+        console.log("Raw OpenAI response:", parsedContent);
 
         if (!Array.isArray(fields)) {
             throw new Error("Expected fields to be an array");
         }
 
-        const validatedFields = FormFieldsResponseSchema.parse(fields);
+
+
+        const validatedFields = FormFieldsResponseSchema.parse(parsedContent);
         return validatedFields;
     } catch (error) {
         console.error("Error generating or validating form fields:", error);
-        throw new Error("Failed to generate valid form fields");
+        throw error;
+
     }
 }

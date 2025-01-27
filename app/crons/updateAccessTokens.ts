@@ -46,11 +46,11 @@ export async function refreshAccessToken(refreshToken: string, docusignId: strin
     }
 }
 
-
-
-const usersX = await db.select().from(users) 
-for (const user of usersX) {
-    const refreshToken = user.refreshToken;
-    const accessToken = await refreshAccessToken(refreshToken, user.docusignId);
-    console.log(accessToken);
+export const refreshAllAccessTokens = async () => {
+    const usersX = await db.select().from(users)
+    for (const user of usersX) {
+        const refreshToken = user.refreshToken;
+        const accessToken = await refreshAccessToken(refreshToken, user.docusignId);
+        console.log(accessToken);
+    }
 }

@@ -51,7 +51,7 @@ const sendEmailToDonors = async (
 
 const alreadyHandled: string[] = []
 
-const sendEmailsToDonors = async () => {
+export const sendEmailsToDonors = async () => {
 
     const complianceFormsXX = await db.select()
         .from(complianceForms)
@@ -77,5 +77,3 @@ const sendEmailsToDonors = async () => {
         alreadyHandled.push(complianceForm.compliance_forms.envelopeId);
     }
 }
-
-sendEmailsToDonors()
