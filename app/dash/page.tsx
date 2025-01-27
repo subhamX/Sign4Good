@@ -4,10 +4,10 @@ import Link from "next/link";
 import { LANDING_ROUTE, ONBOARD_ROUTE } from "@/routes.config";
 import { getUserInServer } from "../utils/setAuthTokenAsCookie";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { eq } from "drizzle-orm";
+import { count, countDistinct, eq, lt, sum } from "drizzle-orm";
 import { db } from "@/drizzle/db-config";
 import { HyperText } from "@/components/ui/hypertext";
-import { accounts, usersToAccountsBridgeTable } from "@/drizzle/schema";
+import { accounts, complianceForms, monitoredEnvelopes, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +30,16 @@ async function DashboardPage() {
   const alreadyConnectedAccounts = await db.select().from(accounts)
     .innerJoin(usersToAccountsBridgeTable, eq(accounts.docuSignAccountId, usersToAccountsBridgeTable.accountId))
     .where(eq(usersToAccountsBridgeTable.userId, user.docusignId))
+
+
+  const stats = await db.select({
+    totalFunding: sum(monitoredEnvelopes.moneyReceivedTillDate).mapWith(Number),
+    totalComplianceForms: count(complianceForms.id),
+    numberOfRegisteredOrganizations: countDistinct(accounts.docuSignAccountId)
+  })
+    .from(accounts)
+    .leftJoin(monitoredEnvelopes, eq(monitoredEnvelopes.accountId, accounts.docuSignAccountId))
+    .leftJoin(complianceForms, eq(monitoredEnvelopes.envelopeId, complianceForms.envelopeId));
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
@@ -73,7 +83,7 @@ async function DashboardPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {alreadyConnectedAccounts.map(({enterprise_info: account}) => (
+            {alreadyConnectedAccounts.map(({ enterprise_info: account }) => (
               <Link href={`/dash/${account.docuSignAccountId}`} key={account.docuSignAccountId} className="block">
                 <Card className="h-full group cursor-pointer border border-primary/20 bg-card/50 backdrop-blur-sm hover:border-4 hover:border-green-700/60 hover:bg-card/80 transition-all duration-100">
                   <CardHeader>
@@ -107,42 +117,40 @@ async function DashboardPage() {
       </section>
 
       {/* Quick Stats Section */}
-      {alreadyConnectedAccounts.length > 0 && (
-        <section className="mt-8 md:mt-12">
-          <Card className="relative bg-primary/5 overflow-hidden">
+      <section className="mt-8 md:mt-12">
+        <Card className="relative bg-primary/5 overflow-hidden">
           <BorderBeam size={250} duration={10} delay={9} />
-            <CardHeader className="pb-2 md:pb-4">
-              <HyperText className="text-xl md:text-xl">💡 Platform Highlights</HyperText>
-              <CardDescription className="text-sm md:text-base">Quick overview of SignForGood&apos;s impact</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                  <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-                  <div>
-                    <p className="text-xl md:text-2xl font-bold">$0</p>
-                    <p className="text-xs md:text-sm text-muted-foreground">Funds Tracked</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 md:gap-4">
-                  <FileCheck className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-                  <div>
-                    <p className="text-xl md:text-2xl font-bold">0</p>
-                    <p className="text-xs md:text-sm text-muted-foreground">Compliance Forms</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 md:gap-4">
-                  <Trophy className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-                  <div>
-                    <p className="text-xl md:text-2xl font-bold">0</p>
-                    <p className="text-xs md:text-sm text-muted-foreground">Impact Score</p>
-                  </div>
+          <CardHeader className="pb-2 md:pb-4">
+            <HyperText className="text-xl md:text-xl">💡 Platform Highlights</HyperText>
+            <CardDescription className="text-sm md:text-base">Quick overview of SignForGood&apos;s impact</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+              <div className="flex items-center gap-3 md:gap-4">
+                <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                <div>
+                  <p className="text-xl md:text-2xl font-bold">${stats[0].totalFunding}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Funds Tracked</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </section>
-      )}
+              <div className="flex items-center gap-3 md:gap-4">
+                <FileCheck className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                <div>
+                  <p className="text-xl md:text-2xl font-bold">{stats[0].totalComplianceForms}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Compliance Forms</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 md:gap-4">
+                <Trophy className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                <div>
+                  <p className="text-xl md:text-2xl font-bold">{stats[0].numberOfRegisteredOrganizations}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Registered NGOs</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   )
 }

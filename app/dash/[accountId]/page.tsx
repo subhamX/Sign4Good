@@ -3,7 +3,7 @@ import { db } from "@/drizzle/db-config";
 import { accounts, complianceForms, monitoredEnvelopes, usersToAccountsBridgeTable } from "@/drizzle/schema";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { LANDING_ROUTE } from "@/routes.config";
+import { DASH_ACCOUNT_COMPLIANCE_ROUTE, LANDING_ROUTE } from "@/routes.config";
 import { CollapsibleDetails } from "./CollapsibleDetails";
 import { HyperText } from "@/components/ui/hypertext";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -15,6 +15,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { COUNTRIES } from "@/app/onboarding/countries";
+import Link from "next/link";
+import { UserCircle, Users, Calendar, ClipboardCheck } from "lucide-react";
 
 export default async function AccountDashboard({
   params
@@ -26,7 +28,7 @@ export default async function AccountDashboard({
     redirect(LANDING_ROUTE);
   }
 
-  const {accountId} = await params;
+  const { accountId } = await params;
 
   // Get account info
   const accountInfo = await db
@@ -100,7 +102,7 @@ export default async function AccountDashboard({
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Monitored Documents</h2>
           <a href={`/dash/${accountId}/import`} className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            Import Documents 
+            Import Documents
             <Import className="w-5 h-5 ml-2 group-hover:text-white" />
           </a>
         </div>
@@ -109,7 +111,7 @@ export default async function AccountDashboard({
             <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
               <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8">
-                <HyperText className="text-2xl font-semibold text-gray-800 mb-3">Get Started with SignForGood</HyperText>
+                  <HyperText className="text-2xl font-semibold text-gray-800 mb-3">Get Started with SignForGood</HyperText>
                   <p className="text-gray-600">Set up your NGO's compliance monitoring system in three easy steps</p>
                 </div>
 
@@ -154,206 +156,164 @@ export default async function AccountDashboard({
             </div>
           ) : (
 
-          <div className="grid gap-5">
-            {monitoredEnvelopesData.map(({monitored_envelopes: envelope, mostRecentComplianceForms}) => {
-              const isOverdue = new Date(envelope.nextReviewDate) < new Date();
-              const envelopeInfo = envelope.additionalInfo;
+            <div className="grid gap-5">
+              {monitoredEnvelopesData.map(({ monitored_envelopes: envelope, mostRecentComplianceForms }) => {
+                const isOverdue = new Date(envelope.nextReviewDate) < new Date();
+                const envelopeInfo = envelope.additionalInfo;
 
-              return (
-                <div
-                  key={envelope.envelopeId}
-                  className={`bg-white p-6 mb-6 rounded-lg border shadow border-l-4 ${isOverdue ? 'border-red-500' :
-                   'border-green-500'
-                    }`}
-                >
-                  <div className="flex flex-col justify-between gap-4">
-                    <div className="flex-grow">
-                      <div className="flex items-start justify-between mb-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <h3 className="text-lg font-semibold cursor-help">{envelopeInfo.emailSubject || 'Untitled Document'}</h3>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Document subject from DocuSign</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className={`px-3 py-1 rounded-full text-sm cursor-help w-full text-center ${envelopeInfo.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                envelopeInfo.status === 'sent' ? 'bg-blue-100 text-blue-800' :
-                                  'bg-gray-100 text-gray-800'
+                return (
+                  <div key={envelope.envelopeId} className="relative group/card">
+                    <Link href={DASH_ACCOUNT_COMPLIANCE_ROUTE(accountId, envelope.envelopeId)}>
+                      <div
+                        className={`bg-white p-6 rounded-t-xl border shadow-sm hover:shadow-md transition-all duration-200 ${
+                          isOverdue ? 'border-l-4 border-l-red-500' : 'border-l-4 border-l-green-500'
+                        }`}
+                      >
+                        <div className="flex flex-col gap-6">
+                          {/* Header Section */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <h3 className="text-xl font-semibold cursor-help group-hover:text-primary/90 transition-colors">
+                                      {envelopeInfo.emailSubject || 'Untitled Document'}
+                                    </h3>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Document subject from DocuSign</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Created {new Date(envelopeInfo.createdDateTime).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-1 rounded-full text-sm ${
+                                isOverdue ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
                               }`}>
-                                {envelopeInfo.status === 'completed' ? 'Completed' :
-                                 envelopeInfo.status === 'sent' ? 'In Progress' :
-                                 'Draft'}
+                                ${envelope.moneyReceivedTillDate?.toLocaleString() || '0'}
                               </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{envelopeInfo.status === 'completed' ? 'All parties have signed the document' :
-                                envelopeInfo.status === 'sent' ? 'Document has been sent for signatures' :
-                                'Document is in draft state'}</p>
-                            </TooltipContent>
-                          </Tooltip>
+                            </div>
+                          </div>
 
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className={`px-3 py-1 rounded-full text-sm cursor-help w-full text-center ${isOverdue ? 'bg-red-100 text-red-800' : 'bg-purple-100 text-purple-800'}`}>
-                                {isOverdue ? 'Review Required' : 'Monitoring Active'}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{isOverdue ? 'Document requires immediate compliance review' : 'Document is being actively monitored for compliance'}</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className={`px-3 py-1 rounded-full text-sm cursor-help w-full text-center ${envelope.isProcessed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                {envelope.isProcessed ? 'Analysis Complete' : 'Analysis Pending'}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{envelope.isProcessed ? 'Document has been analyzed for compliance requirements' : 'Document is queued for compliance analysis'}</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                        </TooltipProvider>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-600">
-                        <TooltipProvider>
-                          <div className="space-y-4">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                  <p className="font-medium text-gray-700">Created</p>
-                                  <p>{new Date(envelopeInfo.createdDateTime).toLocaleString()}</p>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>When the document was created in DocuSign</p>
-                              </TooltipContent>
-                            </Tooltip>
-
-                            {envelopeInfo.sentDateTime && (
+                          {/* Status Badges */}
+                          <div className="flex flex-wrap gap-2">
+                            <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                    <p className="font-medium text-gray-700">Sent</p>
-                                    <p>{new Date(envelopeInfo.sentDateTime).toLocaleString()}</p>
-                                  </div>
+                                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                    envelopeInfo.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                    envelopeInfo.status === 'sent' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {envelopeInfo.status === 'completed' ? 'Completed' :
+                                     envelopeInfo.status === 'sent' ? 'In Progress' : 'Draft'}
+                                  </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>When the document was sent for signatures</p>
+                                  <p>{envelopeInfo.status === 'completed' ? 'All parties have signed the document' :
+                                     envelopeInfo.status === 'sent' ? 'Document has been sent for signatures' :
+                                     'Document is in draft state'}</p>
                                 </TooltipContent>
                               </Tooltip>
-                            )}
 
-                            {envelopeInfo.completedDateTime && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                    <p className="font-medium text-gray-700">Completed</p>
-                                    <p>{new Date(envelopeInfo.completedDateTime).toLocaleString()}</p>
-                                  </div>
+                                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                    isOverdue ? 'bg-red-100 text-red-800' : 'bg-purple-100 text-purple-800'
+                                  }`}>
+                                    {isOverdue ? 'Review Required' : 'Monitoring Active'}
+                                  </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>When all parties completed signing</p>
+                                  <p>{isOverdue ? 'Document requires immediate compliance review' : 'Document is being actively monitored for compliance'}</p>
                                 </TooltipContent>
                               </Tooltip>
-                            )}
+
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                    envelope.isProcessed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                    {envelope.isProcessed ? 'Analysis Complete' : 'Analysis Pending'}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{envelope.isProcessed ? 'Document has been analyzed for compliance requirements' : 'Document is queued for compliance analysis'}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
 
-                          <div className="space-y-4">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                  <p className="font-medium text-gray-700">Compliance Officer</p>
-                                  <p>{envelope.complianceOfficerEmail}</p>
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    Last notified: {mostRecentComplianceForms?.createdAt ? 
-                                      new Date(mostRecentComplianceForms.createdAt).toLocaleString() : 
-                                      'Never'}
+                          {/* Main Content Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Left Column - Officers */}
+                            <div className="space-y-4">
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-primary/5">
+                                  <UserCircle className="w-5 h-5 text-primary/70" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-700">Compliance Officer</p>
+                                  <p className="text-sm text-gray-600">{envelope.complianceOfficerEmail}</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-primary/5">
+                                  <Users className="w-5 h-5 text-primary/70" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-700">Donor Officer</p>
+                                  <p className="text-sm text-gray-600">{envelope.donorOfficerEmail}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Right Column - Dates & Status */}
+                            <div className="space-y-4">
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-primary/5">
+                                  <Calendar className="w-5 h-5 text-primary/70" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-700">Next Review</p>
+                                  <p className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                                    {new Date(envelope.nextReviewDate).toLocaleDateString()}
                                   </p>
                                 </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Officer responsible for compliance review and their last notification time</p>
-                              </TooltipContent>
-                            </Tooltip>
+                              </div>
 
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                  <p className="font-medium text-gray-700">Donor Officer</p>
-                                  <p>{envelope.donorOfficerEmail}</p>
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-primary/5">
+                                  <ClipboardCheck className="w-5 h-5 text-primary/70" />
                                 </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Officer responsible for donor relations</p>
-                              </TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                  <p className="font-medium text-gray-700">Next Review Date</p>
-                                  <p className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                                    {new Date(envelope.nextReviewDate).toLocaleString()}
-                                  </p>
+                                <div>
+                                  <p className="text-sm font-medium text-gray-700">Compliance Status</p>
+                                  <p className="text-sm text-gray-600">Not Available</p>
                                 </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>When this document needs to be reviewed next for compliance</p>
-                              </TooltipContent>
-                            </Tooltip>
+                              </div>
+                            </div>
                           </div>
-
-                          <div className="space-y-4">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                  <p className="font-medium text-gray-700">Total Funding</p>
-                                  <p>${envelope.moneyReceivedTillDate?.toLocaleString() || '0'}</p>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Total funding amount associated with this document</p>
-                              </TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="cursor-help bg-gray-50 p-3 rounded-lg">
-                                  <p className="font-medium text-gray-700">Compliance Form Status</p>
-                                  <p className="text-gray-600">Not Available</p>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Status of the latest compliance review form</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        </TooltipProvider>
+                        </div>
                       </div>
+                    </Link>
 
-                      <div className="mt-4 border-t pt-4">
+                    {/* Collapsible Details - Outside the Link */}
+                    <div 
+                      className="px-6 pb-6 border-l-4 border-l-green-500 bg-white rounded-b-xl border-x border-b shadow-sm transition-colors"
+                    >
+                      <div className="pt-4 border-t">
                         <CollapsibleDetails envelope={envelope} />
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
           )}
-
         </div>
       </div>
     </div>
