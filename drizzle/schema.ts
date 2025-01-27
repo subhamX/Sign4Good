@@ -1,6 +1,6 @@
+import { SignForGoodWebFormTypeUnionType } from '@/app/crons/utils/pdfToForm';
 import { EnvelopeDocuSign } from '@/app/dash/[accountId]/envelopes.server';
 import { pgTable, serial, text, timestamp, integer, boolean, jsonb, primaryKey } from 'drizzle-orm/pg-core';
-import { SignForGoodWebFormTypeUnion, SignForGoodWebFormTypeUnionType } from '@/app/crons/createFormsAndStoreInDb';
 import { z } from 'zod';
 
 // Users table to store DocuSign authenticated users
