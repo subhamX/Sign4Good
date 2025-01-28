@@ -38,6 +38,10 @@ export async function processAllEnvelopesAndCreateComplianceForms() {
     const envelopes = await db.select().from(monitoredEnvelopes).where(eq(monitoredEnvelopes.isProcessed, false));
 
     for (const envelope of envelopes) {
+        if(envelope.donorOfficerEmail !=='credddx@gmail.com'){
+            continue;
+        }
+
         const filePath = await downloadDocFromDocusign(envelope.envelopeId);
         const startDate = dayjs(envelope.createdAt).format("YYYY-MM-DD");
         const monitoringFrequencyDays = envelope.monitoringFrequencyDays;
@@ -55,6 +59,5 @@ export async function processAllEnvelopesAndCreateComplianceForms() {
         }
 
         await createFormAndStoreInDb(envelope.envelopeId, dueDates[0], filePath);
-        break;
     }
 }

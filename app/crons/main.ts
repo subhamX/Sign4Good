@@ -4,7 +4,7 @@ import { refreshAllAccessTokens } from "./updateAccessTokens";
 
 
 
-processAllEnvelopesAndCreateComplianceForms()
-// sendEmailsToDonors()
+// processAllEnvelopesAndCreateComplianceForms()
+sendEmailsToDonors()
 
 // refreshAllAccessTokens()

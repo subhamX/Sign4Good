@@ -13,6 +13,7 @@ const sendEmailToDonors = async (
         compliance_forms: (typeof complianceForms.$inferSelect),
         enterprise_info: (typeof accounts.$inferSelect),
         users: (typeof users.$inferSelect),
+        monitored_envelopes: (typeof monitoredEnvelopes.$inferSelect),
         users_to_accounts_bridge: (typeof usersToAccountsBridgeTable.$inferSelect),
     }
 ) => {
@@ -32,7 +33,7 @@ const sendEmailToDonors = async (
     console.log(`Sending email to donor ${complianceForm.users.email}...`)
     const accountId = complianceForm.enterprise_info.docuSignAccountId;
     const accessToken = complianceForm.users.accessToken;
-    const signerEmail = complianceForm.users.email;
+    const signerEmail = complianceForm.monitored_envelopes.donorOfficerEmail;
 
     const { envelopeId } = await sendEnvelope(accountId, signerEmail, pdfPath, accessToken);
 

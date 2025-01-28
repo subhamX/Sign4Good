@@ -29,7 +29,7 @@ export function ComplianceCardClient({ form, envelopeInfo }: {
   }
 
   const handleCopyLink = () => {
-    const formLink = `${window.location.origin}/compliance-form/${form.id}`
+    const formLink = `${window.location.origin}/forms/${form.id}`
     navigator.clipboard.writeText(formLink)
     toast({
       title: "Link Copied",

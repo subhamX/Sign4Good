@@ -36,7 +36,7 @@ export default function OnboardingClient({
         defaultValues: {
             donationLink: "",
             country: "",
-            leaderboard: false,
+            leaderboard: true,
             accountId: ""
         }
     })
@@ -161,7 +161,7 @@ export default function OnboardingClient({
                                 <Card className="group backdrop-blur-sm bg-card/50 border-primary/10 transition-all duration-500 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 hover:bg-card/80">
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
-                                            <CardTitle className="text-xl font-semibold line-clamp-1 group-hover:text-primary transition-colors duration-300">
+                                            <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors duration-300">
                                                 {account.account_name}
                                             </CardTitle>
                                             <div className="flex items-center text-muted-foreground">

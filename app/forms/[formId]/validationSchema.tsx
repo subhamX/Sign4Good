@@ -17,7 +17,8 @@ export const getValidationSchemaFromSchema = (schema: FormField[]) => z.object(
                 if (field.validation.pattern) fieldSchema = fieldSchema.regex(new RegExp(field.validation.pattern));
                 break;
             case 'number_field':
-                fieldSchema = field.validation.integer_only ? z.number().int() : z.number();
+                console.log(field.validation);
+                fieldSchema = field.validation.integer_only ? z.coerce.number().int() : z.coerce.number();
                 if (field.validation.min !== undefined) fieldSchema = fieldSchema.min(field.validation.min);
                 if (field.validation.max !== undefined) fieldSchema = fieldSchema.max(field.validation.max);
                 break;
